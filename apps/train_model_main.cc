@@ -1,6 +1,8 @@
 #include <core/image.h>
-#include <iostream>
+#include <core/raster.h>
+
 #include <fstream>
+#include <iostream>
 #include <vector>
 
 // TODO: You may want to change main's signature to take in argc and argv
@@ -19,6 +21,7 @@ vector<double> CalculatePriorProbabilities(std::ifstream &ifstream, naivebayes::
     double probability_of_num =
         static_cast<double>(std::count(training_vec.begin(), training_vec.end(), num))/training_vec.size();
 
+    //std::cout<<num<<": "<<probability_of_num<<std::endl;
     prior_probabilities.push_back(probability_of_num);
   }
   return prior_probabilities;
@@ -28,9 +31,14 @@ int main() {
   // TODO: Replace this with code that reads the training data, trains a model,
   // and saves the trained model to a file.
 
-  std::ifstream ifstream;
+  std::ifstream ifstream_labels;
   naivebayes::Image image;
-  vector<double> prior_probabilities = CalculatePriorProbabilities(ifstream, image);
-
+  vector<double> prior_probabilities = CalculatePriorProbabilities(ifstream_labels, image);
+  std::ifstream ifstream_images;
+  ifstream_images.open("mnistdatatraining/trainingimages");
+  while(ifstream_images.good()) {
+    ifstream_images>> image;
+  }
+  naivebayes::Raster raster(0,0);
   return 0;
 }
