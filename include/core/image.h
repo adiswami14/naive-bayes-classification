@@ -8,8 +8,9 @@ using std::vector;
 class Image {
  private:
   vector<int> training_label_vec_;
-  const size_t kLaplaceSmoothingFactor = 1;
  public:
+  const size_t kLaplaceSmoothingFactor = 1;
+
   std::string GetBestClass() const;
 
   /**
@@ -25,12 +26,6 @@ class Image {
    * @return Private variable training_label_vec
    */
   vector<int> GetTrainingLabelVec() const;
-
-  /**
-   * Returns the kLaplaceSmoothingFactor variable
-   * @return The Laplace smoothing factor
-   */
-  size_t GetLaplaceSmoothingFactor() const;
 
   /**
    * Identifies how many training images are in a given class

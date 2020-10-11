@@ -20,10 +20,6 @@ vector<int> Image::GetTrainingLabelVec() const{
   return training_label_vec_;
 }
 
-size_t Image::GetLaplaceSmoothingFactor() const {
-  return kLaplaceSmoothingFactor;
-}
-
 size_t Image::GetNumOfImagesInClass(size_t class_num) const {
   return count(training_label_vec_.begin(), training_label_vec_.end(), class_num);
 }
