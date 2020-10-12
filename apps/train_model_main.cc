@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <cctype>
 
 // TODO: You may want to change main's signature to take in argc and argv
 using std::vector;
@@ -39,6 +40,6 @@ int main() {
   while(ifstream_images.good()) {
     ifstream_images>> image;
   }
-  naivebayes::Raster raster(0,0);
+
   return 0;
 }

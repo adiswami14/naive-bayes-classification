@@ -1,20 +1,22 @@
 #include <core/image.h>
 #include <iostream>
+#include <core/raster.h>
 
 namespace naivebayes {
 
 using std::count;
 using std::string;
 
+size_t raster_vector_key = 0;
+
 std::string Image::GetBestClass() const {
   return "CS 126";
 }
 
 std::istream &operator >>(std::istream &istream, Image& image) {
-  /*int training_val;
-  istream >> training_val;
-  image.training_label_vec_.push_back(training_val);*/
+  naivebayes::Raster current_raster;
   string s;
+  size_t line_size;
   getline(istream, s);
   if(s.length() <= 3) {
     try {
@@ -27,7 +29,18 @@ std::istream &operator >>(std::istream &istream, Image& image) {
     for(char ch : s) {
       char_vec.push_back(ch);
     }
-    image.training_image_vec_.push_back(char_vec);
+    line_size = char_vec.size();
+    if(image.training_image_vec_.size()==line_size-1) {
+        current_raster.SetRasterVector(image.training_image_vec_);
+        current_raster.SetRasterImageClass(image.training_label_vec_.at(raster_vector_key));
+        current_raster.CheckOverallShading();
+        image.training_image_vec_.clear();
+        std::cout<<raster_vector_key << "     " << image.training_label_vec_.at(raster_vector_key)<<std::endl;
+        raster_vector_key++;
+        image.raster_list_.push_back(current_raster);
+    } else {
+      image.training_image_vec_.push_back(char_vec);
+    }
   }
   return istream;
 }

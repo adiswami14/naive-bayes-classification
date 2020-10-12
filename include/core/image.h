@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <core/raster.h>
 
 namespace naivebayes {
 
@@ -9,6 +10,7 @@ class Image {
  private:
   vector<int> training_label_vec_;
   vector<vector<char>> training_image_vec_;
+  vector<naivebayes::Raster> raster_list_;
  public:
   const size_t kLaplaceSmoothingFactor = 1;
 
