@@ -22,10 +22,18 @@ vector<double> CalculatePriorProbabilities(std::ifstream &ifstream, naivebayes::
     double probability_of_num =
         static_cast<double>(std::count(training_vec.begin(), training_vec.end(), num))/training_vec.size();
 
-    //std::cout<<num<<": "<<probability_of_num<<std::endl;
     prior_probabilities.push_back(probability_of_num);
   }
   return prior_probabilities;
+}
+
+double FindProbabilityOfShadingAtPoint(const naivebayes::Image &image, size_t raster_image_class, std::pair<size_t, size_t> pair) {
+  double numerator;
+  size_t num_shaded_at_point = image.GetFrequencyMap()[raster_image_class][pair.first][pair.second];
+  numerator = image.kLaplaceSmoothingFactor+(double)num_shaded_at_point;
+  double denominator;
+  denominator = (2*image.kLaplaceSmoothingFactor)+image.GetNumOfImagesInClass(raster_image_class);
+  return numerator/denominator;
 }
 
 int main() {
@@ -41,5 +49,16 @@ int main() {
     ifstream_images>> image;
   }
 
+  //vector<naivebayes::Raster> raster_list = image.GetRasterList();
+  std::ofstream ofstream;
+  ofstream.open("probabilities");
+  for(size_t cl = 0; cl <= 9; cl++) { //class number
+    for(size_t x=0;x<28;x++) {
+      for (size_t y = 0; y < 28; y++) {
+      ofstream <<cl << " "<<prior_probabilities[cl] << " "
+                 << FindProbabilityOfShadingAtPoint(image, cl, std::make_pair(x, y)) << std::endl;
+      }
+    }
+  }
   return 0;
 }

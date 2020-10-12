@@ -16,8 +16,6 @@ using std::map;
 
 class Raster {
  private:
-  void EvaluateShadingAtPoint(size_t i, size_t j);
-
   //vector of a single image
   vector<vector<char>> raster_vector_;
 
@@ -26,14 +24,13 @@ class Raster {
 
   //stores whether certain pixel of a image of a certain class is shaded
   map<std::pair<size_t, size_t>, size_t> shade_map_;
+
  public:
   Raster();
 
   void SetRasterVector(const vector<vector<char>> &raster_vector);
 
   void SetRasterImageClass(size_t raster_image_class);
-
-  void CheckOverallShading();
 };
 } //namespace naivebayes
 

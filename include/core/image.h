@@ -11,8 +11,13 @@ class Image {
   vector<int> training_label_vec_;
   vector<vector<char>> training_image_vec_;
   vector<naivebayes::Raster> raster_list_;
+  map<size_t, vector<vector<size_t>>> frequency_map_;
  public:
   const size_t kLaplaceSmoothingFactor = 1;
+
+  Image();
+
+  void InitializeFrequencyMap();
 
   std::string GetBestClass() const;
 
@@ -42,6 +47,10 @@ class Image {
    * @return The number of training images in a certain class
    */
   size_t GetNumOfImagesInClass(size_t class_num) const;
+
+  vector<naivebayes::Raster> GetRasterList() const;
+
+  map<size_t, vector<vector<size_t>>> GetFrequencyMap() const;
 };
 }  // namespace naivebayes
 
