@@ -17,6 +17,9 @@ void Raster::SetRasterVector(const vector<vector<char>> &raster_vector) {
 }
 
 void Raster::SetRasterImageClass(size_t raster_image_class) {
+  if(raster_image_class>9) {
+    throw std::invalid_argument("Raster image class input is not a single-digit number");
+  }
   raster_image_class_ = raster_image_class;
 }
 

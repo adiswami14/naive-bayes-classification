@@ -46,7 +46,7 @@ double FindProbabilityOfShadingAtPoint(const naivebayes::Image &image, size_t ra
   size_t num_shaded_at_point = image.GetFrequencyMap()[raster_image_class][pair.first][pair.second];
   numerator = image.kLaplaceSmoothingFactor+(double)num_shaded_at_point;
   double denominator;
-  denominator = (10*image.kLaplaceSmoothingFactor)+image.GetNumOfImagesInClass(raster_image_class);
+  denominator = (2*image.kLaplaceSmoothingFactor)+image.GetNumOfImagesInClass(raster_image_class);
   return numerator/denominator;
 }
 
