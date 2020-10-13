@@ -5,12 +5,28 @@
 namespace naivebayes {
 
 using std::vector;
+using std::string;
 
 /**
  * Stores all the data for all the images, including all the training dataset variables
  */
 class Image {
  private:
+  /**
+   * Updates frequency_map_ variable with new pixels for a certain class
+   * @param s The string representing the current line of the text file
+   * @param image_class The class of the current Raster image
+   */
+  void UpdateFrequencyMap(const string& s, size_t image_class);
+
+  /**
+   * Adds current Raster image to raster_list_ variable
+   * @param char_vec The current vector of characters in the current line of the text file
+   * @param current_raster The current Raster image
+   * @param image_class The class of the current Raster image
+   */
+  void AddCurrentRasterToList(const vector<char> &char_vec, naivebayes::Raster &current_raster, size_t image_class);
+
   //vector that stores all the training labels
   vector<int> training_label_vec_;
 
@@ -48,6 +64,12 @@ class Image {
   friend std::istream &operator >>(std::istream &istream, Image& image);
 
   /**
+   * Sets value of training_label_vec_ variable to variable passed in
+   * @param training_label_vec The vector of ints corresponding to all the training label numbers
+   */
+  void SetTrainingLabelVec(const vector<int> &training_label_vec);
+
+  /**
    * Returns the training_label_vec variable
    * @return Private variable training_label_vec
    */
@@ -67,21 +89,27 @@ class Image {
   void InitializeFrequencyMap(size_t frequency_map_size);
 
   /**
+   * Sets value of frequency_map_ variable to variable passed in
+   * @param frequency_map The map tracking frequency of shading at each class
+   */
+  void SetFrequencyMap(const map<size_t, vector<vector<size_t>>> &frequency_map);
+
+  /**
    * Gets the frequency_map_ variable
    * @return A map that tracks frequency of shading at each class
    */
   map<size_t, vector<vector<size_t>>> GetFrequencyMap() const;
+
+  /**
+   * Sets value of raster_list_ variable to variable passed in
+   * @param raster_list The vector of Raster elements in a file
+   */
+  void SetRasterList(const vector<naivebayes::Raster> &raster_list);
+
+  /**
+   * Gets the list of Raster elements (a la images) in a file
+   * @return Vector of Raster elements in a file
+   */
+  vector<naivebayes::Raster> GetRasterList() const;
 };
 }  // namespace naivebayes
-
-/*
-TODO: rename this file. You'll also need to modify CMakeLists.txt.
-
-You can (and should) create more classes and files in include/core (header
- files) and src/core (source files); this project is too big to only have a
- single class.
-
-Make sure to add any files that you create to CMakeLists.txt.
-
-TODO Delete this comment before submitting your code.
-*/

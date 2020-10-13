@@ -38,10 +38,22 @@ class Raster {
   void SetRasterVector(const vector<vector<char>> &raster_vector);
 
   /**
-   * Sets value of raster_image_class variable to variable passed in
+   * Returns vector of all characters in image
+   * @return Value of the raster_vector_ variable
+   */
+  vector<vector<char>> GetRasterVector() const;
+
+  /**
+   * Sets value of raster_image_class_ variable to variable passed in
    * @param raster_image_class A number to assign a class variable to an image
    */
   void SetRasterImageClass(size_t raster_image_class);
+
+  /**
+   * Returns class value of the Raster instance
+   * @return Value of the raster_image_class_ variable
+   */
+  size_t GetRasterImageClass() const;
 };
 } //namespace naivebayes
 

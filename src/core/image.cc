@@ -7,16 +7,20 @@ namespace naivebayes {
 using std::count;
 using std::string;
 
-size_t raster_vector_key = 0; //tracks current key of image corresponding to training label
-size_t curr_row =0; //tracks current row of the image to be scanned
+size_t raster_vector_key; //tracks current key of image corresponding to training label
+size_t curr_row; //tracks current row of the image to be scanned
 
 Image::Image() {
   //default 28x28 grid
   InitializeFrequencyMap(28);
+  raster_vector_key=0;
+  curr_row=0;
 }
 
 Image::Image(size_t frequency_map_size) {
   InitializeFrequencyMap(frequency_map_size);
+  raster_vector_key=0;
+  curr_row=0;
 }
 
 std::string Image::GetBestClass() const {
@@ -26,7 +30,6 @@ std::string Image::GetBestClass() const {
 std::istream &operator >>(std::istream &istream, Image& image) {
   naivebayes::Raster current_raster;
   string s;
-  size_t line_size;
   getline(istream, s);
   if(s.length() <= 2) {
     try {
@@ -39,28 +42,21 @@ std::istream &operator >>(std::istream &istream, Image& image) {
     vector<char> char_vec;
     size_t image_class = image.training_label_vec_.at(raster_vector_key);
 
-    for(size_t pos =0; pos<s.length();pos++) {
-      char ch = s.at(pos);
+    for(char ch: s) {
       char_vec.push_back(ch);
-      if (!isspace(ch)) {
-        image.frequency_map_[image_class][curr_row][pos]++;
-      }
     }
 
-    line_size = char_vec.size();
-    if(image.training_image_vec_.size()==line_size-1) {
-        current_raster.SetRasterVector(image.training_image_vec_);
-        current_raster.SetRasterImageClass(image_class);
-        image.training_image_vec_.clear();
-        raster_vector_key++;
-        image.raster_list_.push_back(current_raster);
-        curr_row = 0;
-    } else {
-      image.training_image_vec_.push_back(char_vec);
-      curr_row++;
-    }
+    image.UpdateFrequencyMap(s, image_class);
+    image.AddCurrentRasterToList(char_vec, current_raster, image_class);
   }
   return istream;
+}
+
+void Image::SetTrainingLabelVec(const vector<int> &training_label_vec) {
+  if(training_label_vec.empty()) {
+    throw std::invalid_argument("Empty training label vector passed in");
+  }
+  training_label_vec_ = training_label_vec;
 }
 
 vector<int> Image::GetTrainingLabelVec() const{
@@ -71,8 +67,26 @@ size_t Image::GetNumOfImagesInClass(size_t class_num) const {
   return count(training_label_vec_.begin(), training_label_vec_.end(), class_num);
 }
 
+void Image::SetFrequencyMap(const map<size_t, vector<vector<size_t>>> &frequency_map) {
+  if(frequency_map.empty()) {
+    throw std::invalid_argument("Empty frequency map passed in");
+  }
+  frequency_map_ = frequency_map;
+}
+
 map<size_t, vector<vector<size_t>>> Image::GetFrequencyMap() const {
   return frequency_map_;
+}
+
+void Image::SetRasterList(const vector<naivebayes::Raster> &raster_list) {
+  if(raster_list.empty()) {
+    throw std::invalid_argument("Empty frequency map passed in");
+  }
+  raster_list_ = raster_list;
+}
+
+vector<naivebayes::Raster> Image::GetRasterList() const {
+  return raster_list_;
 }
 
 void Image::InitializeFrequencyMap(size_t frequency_map_size) {
@@ -90,5 +104,30 @@ void Image::InitializeFrequencyMap(size_t frequency_map_size) {
     vec_big.clear();
   }
 
+}
+
+void Image::UpdateFrequencyMap(const string& s, size_t image_class) {
+  for(size_t pos =0; pos<s.length();pos++) {
+    char ch = s.at(pos);
+    if (!isspace(ch)) {
+      frequency_map_[image_class][curr_row][pos]++;
+    }
+  }
+}
+
+void Image::AddCurrentRasterToList(const vector<char> &char_vec, naivebayes::Raster &current_raster, size_t image_class) {
+  size_t line_size = char_vec.size();
+  if(training_image_vec_.size()==line_size-1) {
+    training_image_vec_.push_back(char_vec);
+    current_raster.SetRasterVector(training_image_vec_);
+    current_raster.SetRasterImageClass(image_class);
+    training_image_vec_.clear();
+    raster_vector_key++;
+    raster_list_.push_back(current_raster);
+    curr_row = 0;
+  } else {
+    training_image_vec_.push_back(char_vec);
+    curr_row++;
+  }
 }
 }// namespace naivebayes
