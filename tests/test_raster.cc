@@ -16,6 +16,7 @@ TEST_CASE("Setters & Getters"){
 
   SECTION("Set Raster Image Class"){
     naivebayes::Raster raster;
+    REQUIRE_THROWS_AS(raster.SetRasterImageClass(12), std::invalid_argument);
     raster.SetRasterImageClass(4);
     REQUIRE(raster.GetRasterImageClass() == 4);
   }
