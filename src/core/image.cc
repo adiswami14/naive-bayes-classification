@@ -31,6 +31,7 @@ std::istream &operator >>(std::istream &istream, Image& image) {
   naivebayes::Raster current_raster;
   string s;
   getline(istream, s);
+
   if(s.length() <= 2) {
     try {
       int training_val = std::stoi(s, nullptr, 10);
@@ -42,6 +43,7 @@ std::istream &operator >>(std::istream &istream, Image& image) {
     vector<char> char_vec;
     size_t image_class = image.training_label_vec_.at(raster_vector_key);
 
+    //get all characters from a line
     for(char ch: s) {
       char_vec.push_back(ch);
     }

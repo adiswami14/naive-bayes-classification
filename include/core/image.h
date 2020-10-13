@@ -27,6 +27,12 @@ class Image {
    */
   void AddCurrentRasterToList(const vector<char> &char_vec, naivebayes::Raster &current_raster, size_t image_class);
 
+  /**
+   * Initializes frequency_map_ variable to all zeros
+   * @param frequency_map_size The desired size of the frequency map
+   */
+  void InitializeFrequencyMap(size_t frequency_map_size);
+
   //vector that stores all the training labels
   vector<int> training_label_vec_;
 
@@ -81,12 +87,6 @@ class Image {
    * @return The number of training images in a certain class
    */
   size_t GetNumOfImagesInClass(size_t class_num) const;
-
-  /**
-   * Initializes frequency_map_ variable to all zeros
-   * @param frequency_map_size The desired size of the frequency map
-   */
-  void InitializeFrequencyMap(size_t frequency_map_size);
 
   /**
    * Sets value of frequency_map_ variable to variable passed in
