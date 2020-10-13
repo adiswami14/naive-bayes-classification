@@ -4,14 +4,15 @@
 
 using std::vector;
 
-TEST_CASE("Training Labels Test") {
-  SECTION("Operator Overloading") {
-    std::ifstream myFile;
+TEST_CASE("File Reading Tests") {
+  SECTION("Reading over Training Labels") {
+    std::ifstream ifstream;
     naivebayes::Image image;
-    myFile.open("mnistdatatraining/traininglabels");
-    while(myFile.good()) {
-      myFile >> image;
+    ifstream.open("mnistdatatraining/traininglabels");
+    while(ifstream.good()) {
+      ifstream >> image;
     }
     REQUIRE(image.GetTrainingLabelVec().size() == 5000);
+    REQUIRE(image.GetNumOfImagesInClass(0) == 479);
   }
 }

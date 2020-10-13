@@ -69,7 +69,7 @@ ci_make_app(
 ci_make_app(
         APP_NAME        naive-bayes-test
         CINDER_PATH     ${CINDER_PATH}
-        SOURCES         tests/test_main.cc ${SOURCE_FILES} ${TEST_FILES}
+        SOURCES         tests/test_main.cc ${CORE_SOURCE_FILES} src/core/raster.cc include/core/raster.h ${TEST_FILES}
         INCLUDES        include
         LIBRARIES       catch2
 )
