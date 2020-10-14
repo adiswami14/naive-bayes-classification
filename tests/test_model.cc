@@ -94,7 +94,7 @@ TEST_CASE("Reading through datasets") {
   }
 }
 
-TEST_CASE("Accessing Image Member variables") {
+TEST_CASE("Accessing Model Member variables") {
   naivebayes::Model model;
   SECTION("Accessing Training Label Vector") {
     REQUIRE_THROWS_AS(model.SetTrainingLabelVec(vector<int>()),
