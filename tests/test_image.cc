@@ -31,7 +31,7 @@ void ReadTrainingFiles(std::ifstream &ifstream, naivebayes::Image &image) {
   }
 }
 
-TEST_CASE("File Reading Tests") {
+TEST_CASE("Reading through datasets") {
   SECTION("Reading Training Dataset") {
     std::ifstream ifstream;
     naivebayes::Image image;
@@ -94,9 +94,9 @@ TEST_CASE("File Reading Tests") {
   }
 }
 
-TEST_CASE("Setter & Getter Methods") {
+TEST_CASE("Accessing Image Member variables") {
   naivebayes::Image image;
-  SECTION("Training Label Vector") {
+  SECTION("Accessing Training Label Vector") {
     REQUIRE_THROWS_AS(image.SetTrainingLabelVec(vector<int>()),
                       std::invalid_argument);
     vector<int> v;
@@ -105,7 +105,7 @@ TEST_CASE("Setter & Getter Methods") {
     REQUIRE(v == image.GetTrainingLabelVec());
   }
 
-  SECTION("Frequency Map") {
+  SECTION("Accessing Frequency Map") {
     REQUIRE_THROWS_AS(
         image.SetFrequencyMap(map<size_t, vector<vector<size_t>>>()),
         std::invalid_argument);
@@ -115,7 +115,7 @@ TEST_CASE("Setter & Getter Methods") {
     REQUIRE(v == image.GetFrequencyMap());
   }
 
-  SECTION("Raster List") {
+  SECTION("Accessing Raster List") {
     REQUIRE_THROWS_AS(image.SetRasterList(vector<naivebayes::Raster>()),
                       std::invalid_argument);
     vector<naivebayes::Raster> v;

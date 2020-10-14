@@ -3,8 +3,8 @@
 
 using std::vector;
 
-TEST_CASE("Setters & Getters"){
-  SECTION("Set Raster Vector") {
+TEST_CASE("Accessing Raster member variables"){
+  SECTION("Accessing Raster Vector") {
     naivebayes::Raster raster;
     REQUIRE_THROWS_AS(raster.SetRasterVector(vector<vector<char>>()), std::invalid_argument);
     vector<char> vec (3, 0);
@@ -14,7 +14,7 @@ TEST_CASE("Setters & Getters"){
     REQUIRE(vec_2d == raster.GetRasterVector());
   }
 
-  SECTION("Set Raster Image Class"){
+  SECTION("Accessing Raster Image Class"){
     naivebayes::Raster raster;
     REQUIRE_THROWS_AS(raster.SetRasterImageClass(12), std::invalid_argument);
     raster.SetRasterImageClass(4);

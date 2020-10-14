@@ -3,6 +3,8 @@
 #include <catch2/catch.hpp>
 
 using std::vector;
+using std::string;
+
 
 void ReadTestFilesMain(std::ifstream &ifstream, naivebayes::Image &image) {
   ifstream.open("data/testinglabel.txt");
@@ -42,6 +44,33 @@ double FindProbabilityOfShadingAtPoint(const naivebayes::Image &image, size_t ra
   double denominator;
   denominator = (2*image.kLaplaceSmoothingFactor)+image.GetNumOfImagesInClass(raster_image_class);
   return numerator/denominator;
+}
+
+vector<string> RunCommandLineFunctions(const vector<string> &all_args) {
+  if(all_args.empty()) {
+    throw std::invalid_argument("Empty argument vector!");
+  }
+  vector<string> command_args;
+  //train TrainingLabelsName TrainingImagesName save FileToWriteTo
+  if(all_args[0] == "train") {
+    if(all_args.size() == 5) {
+      command_args.push_back(all_args[0]);
+      command_args.push_back(all_args[1]); //equivalent of reading training labels
+      command_args.push_back(all_args[2]); //equivalent of reading training images
+      if (all_args[3] == "save") {
+        command_args.push_back(all_args[3]);
+        command_args.push_back(all_args[4]); //equivalent of saving data to file
+      }
+    } else command_args.push_back("Invalid amount of command line args. Please try again.");
+  } else if(all_args[0] == "load") {  //load FileToLoadUp
+    if(all_args.size() == 2) {
+      command_args.push_back(all_args[0]);
+      command_args.push_back(all_args[1]); //equivalent of loading file
+    } else command_args.push_back("Invalid amount of command line args. Please try again.");
+  } else {
+    command_args.push_back("Invalid command line arg. Please try again.");
+  }
+  return command_args;
 }
 
 TEST_CASE("Processing Prior Probabilities") {
@@ -91,5 +120,84 @@ TEST_CASE("Processing Pixel Probabilities") {
   SECTION("Testing values not in testing labels") {
     REQUIRE(FindProbabilityOfShadingAtPoint(image, 3, std::make_pair(0,0)) == Approx(0.5).epsilon(0.01));
     REQUIRE(FindProbabilityOfShadingAtPoint(image, 9, std::make_pair(3,2)) == Approx(0.5).epsilon(0.01));
+  }
+}
+
+TEST_CASE("Processing Command Line Arguments") {
+  SECTION("Invalid arguments") {
+    //Passing in empty argument
+    vector<string> command_args;
+    command_args.push_back("");
+    vector<string> check_vec = RunCommandLineFunctions(command_args);
+    REQUIRE(check_vec[0] == "Invalid command line arg. Please try again.");
+
+    //Passing in argument that is not accounted for
+    command_args.clear();
+    command_args.push_back("Hey");
+    check_vec = RunCommandLineFunctions(command_args);
+    REQUIRE(check_vec[0] == "Invalid command line arg. Please try again.");
+
+    //Passing in empty whitespace argument
+    command_args.clear();
+    command_args.push_back("      ");
+    check_vec = RunCommandLineFunctions(command_args);
+    REQUIRE(check_vec[0] == "Invalid command line arg. Please try again.");
+
+    //Passing in empty vector
+    command_args.clear();
+    REQUIRE_THROWS_AS(RunCommandLineFunctions(command_args), std::invalid_argument);
+  }
+  SECTION("Training and saving model") {
+    //valid training and saving arguments
+    vector<string> command_args;
+    command_args.push_back("train");
+    command_args.push_back("training_labels_file_name");
+    command_args.push_back("training_image_file_name");
+    command_args.push_back("save");
+    command_args.push_back("data_file_name");
+    vector<string> check_vec = RunCommandLineFunctions(command_args);
+    REQUIRE(check_vec == command_args);
+
+    //Argument that's too short
+    command_args.clear();
+    command_args.push_back("train");
+    command_args.push_back("training_labels_file_name");
+    command_args.push_back("training_image_file_name");
+    check_vec = RunCommandLineFunctions(command_args);
+    REQUIRE(check_vec[0] == "Invalid amount of command line args. Please try again.");
+
+    //Argument that's too long
+    command_args.clear();
+    command_args.push_back("train");
+    command_args.push_back("training_labels_file_name");
+    command_args.push_back("training_image_file_name");
+    command_args.push_back("save");
+    command_args.push_back("data_file_name");
+    command_args.push_back("extra");
+    command_args.push_back("arguments");
+    check_vec = RunCommandLineFunctions(command_args);
+    REQUIRE(check_vec[0] == "Invalid amount of command line args. Please try again.");
+  }
+  SECTION("Loading model") {
+    //valid loading arguments
+    vector<string> command_args;
+    command_args.push_back("load");
+    command_args.push_back("data_file_name");
+    vector<string> check_vec = RunCommandLineFunctions(command_args);
+    REQUIRE(check_vec == command_args);
+
+    //Argument that's too short
+    command_args.clear();
+    command_args.push_back("load");
+    check_vec = RunCommandLineFunctions(command_args);
+    REQUIRE(check_vec[0] == "Invalid amount of command line args. Please try again.");
+
+    //Argument that's too long
+    command_args.clear();
+    command_args.push_back("load");
+    command_args.push_back("extra");
+    command_args.push_back("argument");
+    check_vec = RunCommandLineFunctions(command_args);
+    REQUIRE(check_vec[0] == "Invalid amount of command line args. Please try again.");
   }
 }

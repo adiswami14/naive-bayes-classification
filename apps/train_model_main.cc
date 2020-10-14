@@ -72,6 +72,9 @@ void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Image &image,
  * @param image Current instance of Image class
  */
 void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::Image &image) {
+  if(all_args.empty()) {
+    throw std::invalid_argument("Empty argument vector!");
+  }
   //input and output streams
   std::ifstream ifstream;
   std::ofstream ofstream;
@@ -83,7 +86,6 @@ void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::Image &
       vector<double> prior_probabilities = CalculatePriorProbabilities(ifstream, image);
 
       //read through training images
-      //std::ifstream ifstream_images;
       ifstream.clear();
       ifstream.open(all_args[2]); // mnistdatatraining/trainingimages
       while(ifstream.good()) {
