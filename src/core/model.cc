@@ -29,7 +29,7 @@ std::string Model::GetBestClass() const {
 }
 
 std::istream &operator >>(std::istream &istream, Model& model) {
-  naivebayes::Image current_raster;
+  naivebayes::Image current_image;
   string s;
   getline(istream, s);
 
@@ -45,7 +45,7 @@ std::istream &operator >>(std::istream &istream, Model& model) {
     }
 
     model.UpdateFrequencyMap(s, image_class);
-    model.AddCurrentRasterToList(char_vec, current_raster, image_class);
+    model.AddCurrentImageToList(char_vec, current_image, image_class);
   }
   return istream;
 }
@@ -122,7 +122,7 @@ void Model::UpdateFrequencyMap(const string& s, size_t image_class) {
   }
 }
 
-void Model::AddCurrentRasterToList(const vector<char> &char_vec, naivebayes::Image &current_image, size_t image_class) {
+void Model::AddCurrentImageToList(const vector<char> &char_vec, naivebayes::Image &current_image, size_t image_class) {
   size_t line_size = char_vec.size();
   if(training_image_vec_.size()==line_size-1) {
     training_image_vec_.push_back(char_vec);

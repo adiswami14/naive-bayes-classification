@@ -12,7 +12,7 @@ using std::string;
 /**
  * Calculates the prior probability (P(class = c)) portion of Bayes' Theorem
  * @param ifstream The input file stream
- * @param image Instance of Image containing all data for all images
+ * @param model Instance of Model containing all data for all images
  * @return A vector of all prior probabilities corresponding to each class of images
  */
 vector<double> CalculatePriorProbabilities(std::ifstream &ifstream, naivebayes::Model& model) {
@@ -36,23 +36,23 @@ vector<double> CalculatePriorProbabilities(std::ifstream &ifstream, naivebayes::
 
 /**
  * Calculates the probability of shading at a point (P(class = c | Fi,j=0)) portion of Bayes' Theorem
- * @param image Instance of Image containing all data for all images
- * @param raster_image_class Current class of the Raster image instance
+ * @param model Instance of Model containing all data for all images
+ * @param image_class Current class of the image instance
  * @param pair Pair of coordinates indicating position
  * @return A double representing the probability of shading at a given point for a given class
  */
-double FindProbabilityOfShadingAtPoint(const naivebayes::Model &model, size_t raster_image_class, std::pair<size_t, size_t> pair) {
+double FindProbabilityOfShadingAtPoint(const naivebayes::Model &model, size_t image_class, std::pair<size_t, size_t> pair) {
   double numerator;
-  size_t num_shaded_at_point = model.GetFrequencyMap()[raster_image_class][pair.first][pair.second];
+  size_t num_shaded_at_point = model.GetFrequencyMap()[image_class][pair.first][pair.second];
   numerator = model.kLaplaceSmoothingFactor+(double)num_shaded_at_point;
   double denominator;
-  denominator = (2*model.kLaplaceSmoothingFactor)+model.GetNumOfImagesInClass(raster_image_class);
+  denominator = (2*model.kLaplaceSmoothingFactor)+model.GetNumOfImagesInClass(image_class);
   return numerator/denominator;
 }
 
 /**
  * Writes calculated probabilities to probabilities txt file
- * @param image Instance of Image containing all data for all images
+ * @param model Instance of Model containing all data for all images
  * @param prior_probabilities A vector of all prior probabilities corresponding to each class of images
  */
 void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Model &model, vector<double> prior_probabilities) {
@@ -69,7 +69,7 @@ void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Model &model,
 /**
  * Parses through list of all commands and calls the according functions
  * @param all_args Vector of strings containing all command line arguments passed in
- * @param image Current instance of Image class
+ * @param model Current instance of Model class
  */
 void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::Model &model) {
   if(all_args.empty()) {
@@ -86,10 +86,10 @@ void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::Model &
       vector<double> prior_probabilities = CalculatePriorProbabilities(ifstream, model);
 
       //read through training images
-      ifstream.clear();
-      ifstream.open(all_args[2]); // mnistdatatraining/trainingimages
-      while(ifstream.good()) {
-        ifstream>> model;
+      std::ifstream ifstream_images;
+      ifstream_images.open(all_args[2]); // mnistdatatraining/trainingimages
+      while(ifstream_images.good()) {
+        ifstream_images>> model;
       }
 
       if (all_args[3] == "save") {

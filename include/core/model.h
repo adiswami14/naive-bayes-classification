@@ -26,7 +26,7 @@ class Model {
    * @param current_image The current image
    * @param image_class The class of the current image
    */
-  void AddCurrentRasterToList(const vector<char> &char_vec, naivebayes::Image &current_image, size_t image_class);
+  void AddCurrentImageToList(const vector<char> &char_vec, naivebayes::Image &current_image, size_t image_class);
 
   /**
    * Adds a training label to the training_label_vec_ vector
@@ -56,12 +56,12 @@ class Model {
   const size_t kLaplaceSmoothingFactor = 1;
 
   /**
-   * Default constructor of the Image class
+   * Default constructor of the Model class
    */
   Model();
 
   /**
-   * Overloaded constructor of the Image class
+   * Overloaded constructor of the Model class
    * @param frequency_map_size The desired size of the frequency_map_ variable
    */
   Model(size_t frequency_map_size);

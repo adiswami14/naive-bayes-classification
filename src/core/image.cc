@@ -11,14 +11,14 @@ Image::Image(){
 
 void Image::SetImageVector(const vector<vector<char>> &image_vector) {
   if(image_vector.empty()) {
-    throw std::invalid_argument("Raster vector given as input is empty");
+    throw std::invalid_argument("Image vector given as input is empty");
   }
   image_vector_ = image_vector;
 }
 
 void Image::SetImageClass(size_t image_class) {
   if(image_class>9) {
-    throw std::invalid_argument("Raster image class input is not a single-digit number");
+    throw std::invalid_argument("Image class input is not a single-digit number");
   }
   image_class_ = image_class;
 }
