@@ -7,6 +7,7 @@
 #include <cctype>
 
 using std::vector;
+using std::string;
 
 /**
  * Calculates the prior probability (P(class = c)) portion of Bayes' Theorem
@@ -17,7 +18,6 @@ using std::vector;
 vector<double> CalculatePriorProbabilities(std::ifstream &ifstream, naivebayes::Image& image) {
   //read through training labels
   vector<double> prior_probabilities;
-  ifstream.open("mnistdatatraining/traininglabels");
   while(ifstream.good()) {
     ifstream>> image;
   }
@@ -55,10 +55,7 @@ double FindProbabilityOfShadingAtPoint(const naivebayes::Image &image, size_t ra
  * @param image Instance of Image containing all data for all images
  * @param prior_probabilities A vector of all prior probabilities corresponding to each class of images
  */
-void WriteProbabilitiesToFile(naivebayes::Image &image, vector<double> prior_probabilities) {
-  std::ofstream ofstream;
-  ofstream.open("probabilities");
-
+void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Image &image, vector<double> prior_probabilities) {
   for(size_t cl = 0; cl <= 9; cl++) { //class number
     for(size_t x=0;x<28;x++) {
       for (size_t y = 0; y < 28; y++) {
@@ -67,22 +64,73 @@ void WriteProbabilitiesToFile(naivebayes::Image &image, vector<double> prior_pro
       }
     }
   }
-
 }
 
-int main() {
-  std::ifstream ifstream_labels;
-  naivebayes::Image image;
-  vector<double> prior_probabilities = CalculatePriorProbabilities(ifstream_labels, image);
+/**
+ * Parses through list of all commands and calls the according functions
+ * @param all_args Vector of strings containing all command line arguments passed in
+ * @param image Current instance of Image class
+ */
+void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::Image &image) {
+  //input and output streams
+  std::ifstream ifstream;
+  std::ofstream ofstream;
 
-  //read through training images
-  std::ifstream ifstream_images;
-  ifstream_images.open("mnistdatatraining/trainingimages");
-  while(ifstream_images.good()) {
-    ifstream_images>> image;
+  //train TrainingLabelsName TrainingImagesName save FileToWriteTo
+  if(all_args[0] == "train") {
+    if(all_args.size() == 5) {
+      ifstream.open(all_args[1]); // mnistdatatraining/traininglabels
+      vector<double> prior_probabilities = CalculatePriorProbabilities(ifstream, image);
+
+      //read through training images
+      //std::ifstream ifstream_images;
+      ifstream.clear();
+      ifstream.open(all_args[2]); // mnistdatatraining/trainingimages
+      while(ifstream.good()) {
+        ifstream>> image;
+      }
+
+      if (all_args[3] == "save") {
+        //saves model to file
+        ofstream.open(all_args[4]); // data/probabilities
+        WriteProbabilitiesToFile(ofstream, image, prior_probabilities);
+      }
+
+    } else std::cout<<"Invalid amount of command line args. Please try again."<<std::endl;
+  } else if(all_args[0] == "load") {  //load FileToLoadUp
+    if(all_args.size() == 2) {
+      ifstream.clear();
+      ifstream.open(all_args[1]);
+
+      while(ifstream.good()) {
+        string line;
+        getline(ifstream, line);
+        std::cout<<line<<std::endl;
+      }
+
+    } else std::cout<<"Invalid amount of command line args. Please try again."<<std::endl;
+  } else {
+    std::cout<<"Invalid command line arg. Please try again."<<std::endl;
   }
+}
 
-  //saves model to file
-  WriteProbabilitiesToFile(image, prior_probabilities);
+//https://stackoverflow.com/questions/15344714/convert-command-line-argument-to-string
+/**
+ * Takes in main's parameters, and processes them to run the correct functions
+ * @param argc Argument count
+ * @param argv Argument vector
+ */
+void ProcessCommandLineArgs(int argc, char *argv[]) {
+  //vector of strings consisting of all args passed in (not counting file name)
+  vector<string> all_args;
+  naivebayes::Image image;
+  if (argc > 1) {
+    all_args.assign(argv + 1, argv + argc);
+  }
+  RunCommandLineFunctions(all_args, image);
+}
+
+int main(int argc, char* argv[]) {
+  ProcessCommandLineArgs(argc, argv);
   return 0;
 }

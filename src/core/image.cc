@@ -37,7 +37,7 @@ std::istream &operator >>(std::istream &istream, Image& image) {
       int training_val = std::stoi(s, nullptr, 10);
       image.training_label_vec_.push_back(training_val);
     } catch(std::invalid_argument) {
-      std::cout<<"invalid arg for training value"<<std::endl;
+      std::cout<<"training labels read!"<<std::endl;
     }
   } else {
     vector<char> char_vec;
