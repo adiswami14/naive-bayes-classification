@@ -33,12 +33,7 @@ std::istream &operator >>(std::istream &istream, Image& image) {
   getline(istream, s);
 
   if(s.length() <= 2) {
-    try {
-      int training_val = std::stoi(s, nullptr, 10);
-      image.training_label_vec_.push_back(training_val);
-    } catch(std::invalid_argument) {
-      std::cout<<"training labels read!"<<std::endl;
-    }
+    image.AddTrainingLabelToVector(s);
   } else {
     vector<char> char_vec;
     size_t image_class = image.training_label_vec_.at(raster_vector_key);
@@ -106,6 +101,15 @@ void Image::InitializeFrequencyMap(size_t frequency_map_size) {
     vec_big.clear();
   }
 
+}
+
+void Image::AddTrainingLabelToVector(const string& s) {
+  try {
+    int training_val = std::stoi(s, nullptr, 10);
+    training_label_vec_.push_back(training_val);
+  } catch(std::invalid_argument) {
+    std::cout<<"training labels read!"<<std::endl;
+  }
 }
 
 void Image::UpdateFrequencyMap(const string& s, size_t image_class) {

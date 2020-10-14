@@ -28,6 +28,12 @@ class Image {
   void AddCurrentRasterToList(const vector<char> &char_vec, naivebayes::Raster &current_raster, size_t image_class);
 
   /**
+   * Adds a training label to the training_label_vec_ vector
+   * @param s The string line from the training label file
+   */
+  void AddTrainingLabelToVector(const string& s);
+
+  /**
    * Initializes frequency_map_ variable to all zeros
    * @param frequency_map_size The desired size of the frequency map
    */
@@ -59,6 +65,10 @@ class Image {
    */
   Image(size_t frequency_map_size);
 
+  /**
+   * Just returns "CS 126" for now
+   * @return The class with the highest chance of which an image belongs to
+   */
   std::string GetBestClass() const;
 
   /**
