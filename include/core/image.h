@@ -1,125 +1,60 @@
-#include <string>
+//
+// Created by Adithya Swaminathan on 10/11/20.
+//
+
+#ifndef NAIVE_BAYES_IMAGE_H
+#define NAIVE_BAYES_IMAGE_H
+
+#include <iostream>
 #include <vector>
-#include <core/raster.h>
+#include <map>
 
 namespace naivebayes {
 
 using std::vector;
-using std::string;
+using std::map;
 
 /**
- * Stores all the data for all the images, including all the training dataset variables
+ * Corresponds to a single image from the training data set, used to rasterize characters
  */
 class Image {
  private:
-  /**
-   * Updates frequency_map_ variable with new pixels for a certain class
-   * @param s The string representing the current line of the text file
-   * @param image_class The class of the current Raster image
-   */
-  void UpdateFrequencyMap(const string& s, size_t image_class);
+  //vector of a single image
+  vector<vector<char>> image_vector_;
 
-  /**
-   * Adds current Raster image to raster_list_ variable
-   * @param char_vec The current vector of characters in the current line of the text file
-   * @param current_raster The current Raster image
-   * @param image_class The class of the current Raster image
-   */
-  void AddCurrentRasterToList(const vector<char> &char_vec, naivebayes::Raster &current_raster, size_t image_class);
-
-  /**
-   * Adds a training label to the training_label_vec_ vector
-   * @param s The string line from the training label file
-   */
-  void AddTrainingLabelToVector(const string& s);
-
-  /**
-   * Initializes frequency_map_ variable to all zeros
-   * @param frequency_map_size The desired size of the frequency map
-   */
-  void InitializeFrequencyMap(size_t frequency_map_size);
-
-  //vector that stores all the training labels
-  vector<int> training_label_vec_;
-
-  //2d vector that stores all images in training dataset
-  vector<vector<char>> training_image_vec_;
-
-  //vector of all Rasters (each raster corresponds to an image)
-  vector<naivebayes::Raster> raster_list_;
-
-  //map that stores a 2d-vector of how many times a certain pixel is shaded corresponding to each class of image
-  map<size_t, vector<vector<size_t>>> frequency_map_;
+  //class of given image
+  size_t image_class_;
  public:
-  //The Laplacian constant for training the model
-  const size_t kLaplaceSmoothingFactor = 1;
 
   /**
-   * Default constructor of the Image class
+   * Default Constructor of Raster Class
    */
   Image();
 
   /**
-   * Overloaded constructor of the Image class
-   * @param frequency_map_size The desired size of the frequency_map_ variable
+   * Sets value of raster_vector_ variable to variable passed in
+   * @param raster_vector A 2d-vector of characters corresponding to a single image
    */
-  Image(size_t frequency_map_size);
+  void SetImageVector(const vector<vector<char>> &raster_vector);
 
   /**
-   * Just returns "CS 126" for now
-   * @return The class with the highest chance of which an image belongs to
+   * Returns vector of all characters in image
+   * @return Value of the raster_vector_ variable
    */
-  std::string GetBestClass() const;
+  vector<vector<char>> GetImageVector() const;
 
   /**
-   * Overloads the >> operator for a given image
-   * @param istream The input stream given
-   * @param image The instance of this Image class
-   * @return The input stream after operator overload
+   * Sets value of raster_image_class_ variable to variable passed in
+   * @param raster_image_class A number to assign a class variable to an image
    */
-  friend std::istream &operator >>(std::istream &istream, Image& image);
+  void SetImageClass(size_t raster_image_class);
 
   /**
-   * Sets value of training_label_vec_ variable to variable passed in
-   * @param training_label_vec The vector of ints corresponding to all the training label numbers
+   * Returns class value of the Raster instance
+   * @return Value of the raster_image_class_ variable
    */
-  void SetTrainingLabelVec(const vector<int> &training_label_vec);
-
-  /**
-   * Returns the training_label_vec variable
-   * @return Private variable training_label_vec
-   */
-  vector<int> GetTrainingLabelVec() const;
-
-  /**
-   * Identifies how many training images are in a given class
-   * @param class_num The number of the class
-   * @return The number of training images in a certain class
-   */
-  size_t GetNumOfImagesInClass(size_t class_num) const;
-
-  /**
-   * Sets value of frequency_map_ variable to variable passed in
-   * @param frequency_map The map tracking frequency of shading at each class
-   */
-  void SetFrequencyMap(const map<size_t, vector<vector<size_t>>> &frequency_map);
-
-  /**
-   * Gets the frequency_map_ variable
-   * @return A map that tracks frequency of shading at each class
-   */
-  map<size_t, vector<vector<size_t>>> GetFrequencyMap() const;
-
-  /**
-   * Sets value of raster_list_ variable to variable passed in
-   * @param raster_list The vector of Raster elements in a file
-   */
-  void SetRasterList(const vector<naivebayes::Raster> &raster_list);
-
-  /**
-   * Gets the list of Raster elements (a la images) in a file
-   * @return Vector of Raster elements in a file
-   */
-  vector<naivebayes::Raster> GetRasterList() const;
+  size_t GetImageClass() const;
 };
-}  // namespace naivebayes
+} //namespace naivebayes
+
+#endif  // NAIVE_BAYES_IMAGE_H

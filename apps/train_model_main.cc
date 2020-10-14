@@ -1,10 +1,10 @@
 #include <core/image.h>
-#include <core/raster.h>
+#include <core/model.h>
 
+#include <cctype>
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <cctype>
 
 using std::vector;
 using std::string;
@@ -15,19 +15,19 @@ using std::string;
  * @param image Instance of Image containing all data for all images
  * @return A vector of all prior probabilities corresponding to each class of images
  */
-vector<double> CalculatePriorProbabilities(std::ifstream &ifstream, naivebayes::Image& image) {
+vector<double> CalculatePriorProbabilities(std::ifstream &ifstream, naivebayes::Model& model) {
   //read through training labels
   vector<double> prior_probabilities;
   while(ifstream.good()) {
-    ifstream>> image;
+    ifstream>> model;
   }
 
-  vector<int> training_vec = image.GetTrainingLabelVec();
+  vector<int> training_vec = model.GetTrainingLabelVec();
   for(size_t num = 0; num <= 9; num++) {
     //the number of times a certain number shows up in training labels over total number of training labels
     double probability_of_num =
-        (image.kLaplaceSmoothingFactor+ static_cast<double>(std::count(training_vec.begin(), training_vec.end(), num)))
-        /((10*image.kLaplaceSmoothingFactor)+training_vec.size());
+        (model.kLaplaceSmoothingFactor+ static_cast<double>(std::count(training_vec.begin(), training_vec.end(), num)))
+        /((10*model.kLaplaceSmoothingFactor)+training_vec.size());
 
     prior_probabilities.push_back(probability_of_num);
   }
@@ -41,12 +41,12 @@ vector<double> CalculatePriorProbabilities(std::ifstream &ifstream, naivebayes::
  * @param pair Pair of coordinates indicating position
  * @return A double representing the probability of shading at a given point for a given class
  */
-double FindProbabilityOfShadingAtPoint(const naivebayes::Image &image, size_t raster_image_class, std::pair<size_t, size_t> pair) {
+double FindProbabilityOfShadingAtPoint(const naivebayes::Model &model, size_t raster_image_class, std::pair<size_t, size_t> pair) {
   double numerator;
-  size_t num_shaded_at_point = image.GetFrequencyMap()[raster_image_class][pair.first][pair.second];
-  numerator = image.kLaplaceSmoothingFactor+(double)num_shaded_at_point;
+  size_t num_shaded_at_point = model.GetFrequencyMap()[raster_image_class][pair.first][pair.second];
+  numerator = model.kLaplaceSmoothingFactor+(double)num_shaded_at_point;
   double denominator;
-  denominator = (2*image.kLaplaceSmoothingFactor)+image.GetNumOfImagesInClass(raster_image_class);
+  denominator = (2*model.kLaplaceSmoothingFactor)+model.GetNumOfImagesInClass(raster_image_class);
   return numerator/denominator;
 }
 
@@ -55,12 +55,12 @@ double FindProbabilityOfShadingAtPoint(const naivebayes::Image &image, size_t ra
  * @param image Instance of Image containing all data for all images
  * @param prior_probabilities A vector of all prior probabilities corresponding to each class of images
  */
-void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Image &image, vector<double> prior_probabilities) {
+void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Model &model, vector<double> prior_probabilities) {
   for(size_t cl = 0; cl <= 9; cl++) { //class number
     for(size_t x=0;x<28;x++) {
       for (size_t y = 0; y < 28; y++) {
         ofstream <<cl << " "<<x<< " "<<y<<" "<< prior_probabilities[cl] << " "
-                 << FindProbabilityOfShadingAtPoint(image, cl, std::make_pair(x, y)) << std::endl;
+                 << FindProbabilityOfShadingAtPoint(model, cl, std::make_pair(x, y)) << std::endl;
       }
     }
   }
@@ -71,7 +71,7 @@ void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Image &image,
  * @param all_args Vector of strings containing all command line arguments passed in
  * @param image Current instance of Image class
  */
-void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::Image &image) {
+void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::Model &model) {
   if(all_args.empty()) {
     throw std::invalid_argument("Empty argument vector!");
   }
@@ -83,19 +83,19 @@ void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::Image &
   if(all_args[0] == "train") {
     if(all_args.size() == 5) {
       ifstream.open(all_args[1]); // mnistdatatraining/traininglabels
-      vector<double> prior_probabilities = CalculatePriorProbabilities(ifstream, image);
+      vector<double> prior_probabilities = CalculatePriorProbabilities(ifstream, model);
 
       //read through training images
       ifstream.clear();
       ifstream.open(all_args[2]); // mnistdatatraining/trainingimages
       while(ifstream.good()) {
-        ifstream>> image;
+        ifstream>> model;
       }
 
       if (all_args[3] == "save") {
         //saves model to file
         ofstream.open(all_args[4]); // data/probabilities
-        WriteProbabilitiesToFile(ofstream, image, prior_probabilities);
+        WriteProbabilitiesToFile(ofstream, model, prior_probabilities);
       }
 
     } else std::cout<<"Invalid amount of command line args. Please try again."<<std::endl;
@@ -125,11 +125,11 @@ void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::Image &
 void ProcessCommandLineArgs(int argc, char *argv[]) {
   //vector of strings consisting of all args passed in (not counting file name)
   vector<string> all_args;
-  naivebayes::Image image;
+  naivebayes::Model model;
   if (argc > 1) {
     all_args.assign(argv + 1, argv + argc);
   }
-  RunCommandLineFunctions(all_args, image);
+  RunCommandLineFunctions(all_args, model);
 }
 
 int main(int argc, char* argv[]) {
