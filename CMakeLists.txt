@@ -54,7 +54,7 @@ list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES}
                             src/visualizer/naive_bayes_app.cc
                             src/visualizer/sketchpad.cc)
 
-list(APPEND TEST_FILES tests/test_model.cc tests/test_image.cc)
+list(APPEND TEST_FILES tests/test_model.cc tests/test_image.cc tests/test_arg_handler.cc tests/test_probability_finder.cc)
 
 add_executable(train-model apps/train_model_main.cc ${CORE_SOURCE_FILES} src/core/image.cc include/core/image.h src/core/arg_handler.cc include/core/arg_handler.h src/core/probability_finder.cc include/core/probability_finder.h)
 target_include_directories(train-model PRIVATE include)
@@ -69,7 +69,7 @@ ci_make_app(
 ci_make_app(
         APP_NAME        naive-bayes-test
         CINDER_PATH     ${CINDER_PATH}
-        SOURCES         tests/test_main.cc ${CORE_SOURCE_FILES} src/core/image.cc include/core/image.h ${TEST_FILES}
+        SOURCES         tests/test_main.cc ${CORE_SOURCE_FILES} src/core/image.cc include/core/image.h src/core/probability_finder.cc include/core/probability_finder.h src/core/arg_handler.cc include/core/arg_handler.h ${TEST_FILES}
         INCLUDES        include
         LIBRARIES       catch2
 )

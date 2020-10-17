@@ -7,10 +7,8 @@ using std::map;
 using std::vector;
 
 void ReadTestFiles(std::ifstream &ifstream, naivebayes::Model &model) {
-  ifstream.open("data/testinglabel.txt");
-  while(ifstream.good()) {
-    ifstream >> model;
-  }
+  model.ReadLabels("data/testinglabel");
+
   std::ifstream ifstream_images;
   ifstream_images.open("data/testingimages");
   while (ifstream_images.good()) {
@@ -19,10 +17,7 @@ void ReadTestFiles(std::ifstream &ifstream, naivebayes::Model &model) {
 }
 
 void ReadTrainingFiles(std::ifstream &ifstream, naivebayes::Model &model) {
-  ifstream.open("mnistdatatraining/traininglabels");
-  while(ifstream.good()) {
-    ifstream >> model;
-  }
+  model.ReadLabels("mnistdatatraining/traininglabels");
 
   std::ifstream ifstream_images;
   ifstream_images.open("mnistdatatraining/trainingimages");

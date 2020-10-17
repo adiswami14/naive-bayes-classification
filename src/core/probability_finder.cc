@@ -10,7 +10,6 @@ namespace naivebayes {
 vector<double> ProbabilityFinder::CalculatePriorProbabilities(const string& filename, naivebayes::Model &model) {
   //read through training labels
   vector<double> prior_probabilities;
-  model.ReadLabels(filename);
 
   vector<int> training_vec = model.GetTrainingLabelVec();
   for(size_t num = 0; num <= 9; num++) {

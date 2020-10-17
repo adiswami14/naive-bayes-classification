@@ -83,10 +83,10 @@ void Model::SetImageList(const vector<naivebayes::Image> &image_list) {
 }
 
 void Model::ReadLabels(const string &filename) {
-  std::ifstream ifstream(filename);
+  std::ifstream istream(filename);
   int training_val;
-  while(ifstream.good()) {
-    ifstream>>training_val;
+  while(istream.good()) {
+    istream>>training_val;
     training_label_vec_.push_back(training_val);
   }
 }
