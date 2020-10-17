@@ -29,12 +29,6 @@ class Model {
   void AddCurrentImageToList(const vector<char> &char_vec, naivebayes::Image &current_image, size_t image_class);
 
   /**
-   * Adds a training label to the training_label_vec_ vector
-   * @param s The string line from the training label file
-   */
-  void AddTrainingLabelToVector(const string& s);
-
-  /**
    * Initializes frequency_map_ variable to all zeros
    * @param frequency_map_size The desired size of the frequency map
    */
@@ -122,5 +116,11 @@ class Model {
    * @return Vector of Image elements in a file
    */
   vector<naivebayes::Image> GetImageList() const;
+
+  /**
+   * Reads labels from file given a filename
+   * @param filename The file name of the training labels file
+   */
+  void ReadLabels(const string &filename);
 };
 }  // namespace naivebayes

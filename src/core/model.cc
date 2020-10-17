@@ -1,6 +1,7 @@
 #include <core/image.h>
 #include <core/model.h>
 
+#include <fstream>
 #include <iostream>
 
 namespace naivebayes {
@@ -32,21 +33,19 @@ std::istream &operator >>(std::istream &istream, Model& model) {
   naivebayes::Image current_image;
   string s;
   getline(istream, s);
-
-  if(s.length() <= 2) {
-    model.AddTrainingLabelToVector(s);
-  } else {
+  if(s.size()!=0) {
     vector<char> char_vec;
     size_t image_class = model.training_label_vec_.at(image_vector_key);
 
-    //get all characters from a line
-    for(char ch: s) {
+    // get all characters from a line
+    for (char ch : s) {
       char_vec.push_back(ch);
     }
 
     model.UpdateFrequencyMap(s, image_class);
     model.AddCurrentImageToList(char_vec, current_image, image_class);
   }
+
   return istream;
 }
 
@@ -83,6 +82,15 @@ void Model::SetImageList(const vector<naivebayes::Image> &image_list) {
   image_list_ = image_list;
 }
 
+void Model::ReadLabels(const string &filename) {
+  std::ifstream ifstream(filename);
+  int training_val;
+  while(ifstream.good()) {
+    ifstream>>training_val;
+    training_label_vec_.push_back(training_val);
+  }
+}
+
 vector<naivebayes::Image> Model::GetImageList() const {
   return image_list_;
 }
@@ -102,15 +110,6 @@ void Model::InitializeFrequencyMap(size_t frequency_map_size) {
     vec_big.clear();
   }
 
-}
-
-void Model::AddTrainingLabelToVector(const string& s) {
-  try {
-    int training_val = std::stoi(s, nullptr, 10);
-    training_label_vec_.push_back(training_val);
-  } catch(std::invalid_argument) {
-    std::cout<<"training labels read!"<<std::endl;
-  }
 }
 
 void Model::UpdateFrequencyMap(const string& s, size_t image_class) {

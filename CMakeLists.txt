@@ -56,7 +56,7 @@ list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES}
 
 list(APPEND TEST_FILES tests/test_model.cc tests/test_image.cc)
 
-add_executable(train-model apps/train_model_main.cc ${CORE_SOURCE_FILES} src/core/image.cc include/core/image.h)
+add_executable(train-model apps/train_model_main.cc ${CORE_SOURCE_FILES} src/core/image.cc include/core/image.h src/core/arg_handler.cc include/core/arg_handler.h src/core/probability_finder.cc include/core/probability_finder.h)
 target_include_directories(train-model PRIVATE include)
 
 ci_make_app(
