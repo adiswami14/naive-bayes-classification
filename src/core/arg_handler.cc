@@ -72,7 +72,7 @@ void ArgHandler::RunCommandLineFunctions(const vector<string> &all_args, naiveba
         if(first) { //TODO: Clean up this code logic
           string s;
           getline(ifstream, s);
-          InitializeLoadedFeatureProbMap(3);
+          InitializeLoadedFeatureProbMap(image_size);
           s=s.substr(6, s.size());
           std::string delimiter = " ";
           std::string feature = s.substr(s.find(delimiter)+1, s.size());
