@@ -45,9 +45,14 @@ class Model {
 
   //map that stores a 2d-vector of how many times a certain pixel is shaded corresponding to each class of image
   map<size_t, vector<vector<size_t>>> frequency_map_;
+
+  size_t image_vector_key_; //tracks current key of image corresponding to training label
+
+  size_t curr_row_; //tracks current row of the image to be scanned
+
  public:
   //The Laplacian constant for training the model
-  const size_t kLaplaceSmoothingFactor = 1;
+  size_t kLaplaceSmoothingFactor = 1;
 
   /**
    * Default constructor of the Model class

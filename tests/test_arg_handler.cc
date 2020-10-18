@@ -11,34 +11,34 @@ using std::string;
 using std::map;
 
 TEST_CASE("Processing Command Line Arguments") {
-  naivebayes::ArgHandler argHandler;
-  naivebayes::Model model;
+  naivebayes::ArgHandler argHandler(3);
+  naivebayes::Model model(3);
   char** argv;
   SECTION("Invalid arguments") {
     //Passing in empty argument
     const char* n_argv[] = {" "};
     argv = const_cast<char**>(n_argv);
-    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(1, argv, model, 28), std::invalid_argument);
+    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(1, argv, model), std::invalid_argument);
 
     //Passing in argument that is not accounted for
     const char* n_argv1[] = {"Hey"};
     argv = const_cast<char**>(n_argv1);
-    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(1, argv, model, 28), std::invalid_argument);
+    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(1, argv, model), std::invalid_argument);
 
     //Passing in empty whitespace argument
     const char* n_argv2[] = {"     "};
     argv = const_cast<char**>(n_argv2);
-    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(1, argv, model, 28), std::invalid_argument);
+    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(1, argv, model), std::invalid_argument);
 
     //Passing in empty argument vector
     argv = {};
-    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(1, argv, model, 28), std::invalid_argument);
+    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(1, argv, model), std::invalid_argument);
   }
   SECTION("Training and saving model") {
     //valid training and saving arguments
     const char* n_argv[] = {"filename", "train", "data/testinglabel", "data/testingimages", "save", "data/test_probs"};
     argv = const_cast<char**>(n_argv);
-    argHandler.ProcessCommandLineArgs(6, argv, model, 3);
+    argHandler.ProcessCommandLineArgs(6, argv, model);
     std::ifstream ifstream("data/test_probs");
     int line_count = 0;
     while(ifstream.good()) {
@@ -52,18 +52,18 @@ TEST_CASE("Processing Command Line Arguments") {
     //Argument that's too short
     const char* n_argv1[] = {"filename", "train", "training_labels_file_name", "training_image_file_name"};
     argv = const_cast<char**>(n_argv1);
-    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(4, argv, model, 3), std::invalid_argument);
+    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(4, argv, model), std::invalid_argument);
 
     //Argument that's too long
     const char* n_argv2[] = {"filename", "train", "training_labels_file_name", "training_image_file_name", "save", "data_file_name", "extra", "arguments"};
     argv = const_cast<char**>(n_argv2);
-    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(8, argv, model, 3), std::invalid_argument);
+    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(8, argv, model), std::invalid_argument);
   }
   SECTION("Loading model") {
     //valid loading arguments
     const char* n_argv[] = {"filename","load", "data/test_probs"};
     argv = const_cast<char**>(n_argv);
-    argHandler.ProcessCommandLineArgs(3, argv, model, 3);
+    argHandler.ProcessCommandLineArgs(3, argv, model);
     vector<double> loaded_prior_probs = argHandler.GetLoadedPriorProbabilities();
     map<size_t, vector<vector<double>>> m = argHandler.GetLoadedFrequencyMap();
     REQUIRE(loaded_prior_probs.at(0) == Approx(0.154).epsilon(0.01));
@@ -79,11 +79,11 @@ TEST_CASE("Processing Command Line Arguments") {
     //Argument that's too short
     const char* n_argv1[] = {"filename","load"};
     argv = const_cast<char**>(n_argv1);
-    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(2, argv, model, 3), std::invalid_argument);
+    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(2, argv, model), std::invalid_argument);
 
     //Argument that's too long
     const char* n_argv2[] = {"filename","load", "extra", "argument"};
     argv = const_cast<char**>(n_argv2);
-    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(2, argv, model, 3), std::invalid_argument);
+    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(2, argv, model), std::invalid_argument);
   }
 }

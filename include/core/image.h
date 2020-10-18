@@ -24,6 +24,9 @@ class Image {
 
   //class of given image
   size_t image_class_;
+
+  //predicted class of given image
+  size_t best_class_;
  public:
 
   /**
@@ -54,6 +57,18 @@ class Image {
    * @return Value of the image_class_ variable
    */
   size_t GetImageClass() const;
+
+  /**
+   * Sets value of best_class_ variable to variable passed in
+   * @param best_class A number to assign a class variable to an image
+   */
+  void SetBestClass(size_t best_class);
+
+  /**
+   * Returns best class prediction value of the Image instance
+   * @return Value of the best_class_ variable
+   */
+  size_t GetBestClass() const;
 };
 } //namespace naivebayes
 

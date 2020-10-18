@@ -1,6 +1,5 @@
 #include <core/image.h>
 #include <core/model.h>
-
 #include <fstream>
 #include <iostream>
 
@@ -9,20 +8,17 @@ namespace naivebayes {
 using std::count;
 using std::string;
 
-size_t image_vector_key; //tracks current key of image corresponding to training label
-size_t curr_row; //tracks current row of the image to be scanned
-
 Model::Model() {
   //default 28x28 grid
   InitializeFrequencyMap(28);
-  image_vector_key=0;
-  curr_row=0;
+  image_vector_key_=0;
+  curr_row_=0;
 }
 
 Model::Model(size_t frequency_map_size) {
   InitializeFrequencyMap(frequency_map_size);
-  image_vector_key=0;
-  curr_row=0;
+  image_vector_key_=0;
+  curr_row_=0;
 }
 
 std::string Model::GetBestClass() const {
@@ -35,7 +31,7 @@ std::istream &operator >>(std::istream &istream, Model& model) {
   getline(istream, s);
   if(s.size()!=0) {
     vector<char> char_vec;
-    size_t image_class = model.training_label_vec_.at(image_vector_key);
+    size_t image_class = model.training_label_vec_.at(model.image_vector_key_);
 
     // get all characters from a line
     for (char ch : s) {
@@ -116,7 +112,7 @@ void Model::UpdateFrequencyMap(const string& s, size_t image_class) {
   for(size_t pos =0; pos<s.length();pos++) {
     char ch = s.at(pos);
     if (!isspace(ch)) {
-      frequency_map_[image_class][curr_row][pos]++;
+      frequency_map_[image_class][curr_row_][pos]++;
     }
   }
 }
@@ -128,12 +124,12 @@ void Model::AddCurrentImageToList(const vector<char> &char_vec, naivebayes::Imag
     current_image.SetImageVector(training_image_vec_);
     current_image.SetImageClass(image_class);
     training_image_vec_.clear();
-    image_vector_key++;
+    image_vector_key_++;
     image_list_.push_back(current_image);
-    curr_row = 0;
+    curr_row_ = 0;
   } else {
     training_image_vec_.push_back(char_vec);
-    curr_row++;
+    curr_row_++;
   }
 }
 }// namespace naivebayes
