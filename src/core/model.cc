@@ -2,6 +2,7 @@
 #include <core/model.h>
 #include <fstream>
 #include <iostream>
+#include <cmath>
 
 namespace naivebayes {
 
@@ -13,16 +14,22 @@ Model::Model() {
   InitializeFrequencyMap(28);
   image_vector_key_=0;
   curr_row_=0;
+  num_in_class_ = vector<size_t>(10, 0);
 }
 
 Model::Model(size_t frequency_map_size) {
   InitializeFrequencyMap(frequency_map_size);
   image_vector_key_=0;
   curr_row_=0;
+  num_in_class_ = vector<size_t>(10, 0);
 }
 
-std::string Model::GetBestClass() const {
-  return "CS 126";
+Model::Model(std::map<size_t, vector<vector<double>>> map) {
+  InitializeFrequencyMap(28);
+  image_vector_key_=0;
+  curr_row_=0;
+  num_in_class_ = vector<size_t>(10, 0);
+  feature_prob_map_ = map;
 }
 
 std::istream &operator >>(std::istream &istream, Model& model) {
@@ -32,7 +39,6 @@ std::istream &operator >>(std::istream &istream, Model& model) {
   if(s.size()!=0) {
     vector<char> char_vec;
     size_t image_class = model.training_label_vec_.at(model.image_vector_key_);
-
     // get all characters from a line
     for (char ch : s) {
       char_vec.push_back(ch);
@@ -56,8 +62,14 @@ vector<int> Model::GetTrainingLabelVec() const{
   return training_label_vec_;
 }
 
-size_t Model::GetNumOfImagesInClass(size_t class_num) const {
-  return count(training_label_vec_.begin(), training_label_vec_.end(), class_num);
+void Model::SetNumOfImagesInClass(){
+  for(int x=0;x<=9;x++) {
+    num_in_class_[x] = std::count(training_label_vec_.begin(), training_label_vec_.end(), x);
+  }
+}
+
+vector<size_t> Model::GetNumOfImagesInClass() const {
+  return num_in_class_;
 }
 
 void Model::SetFrequencyMap(const map<size_t, vector<vector<size_t>>> &frequency_map) {
@@ -85,10 +97,61 @@ void Model::ReadLabels(const string &filename) {
     istream>>training_val;
     training_label_vec_.push_back(training_val);
   }
+  if(istream.eof()) {
+    prior_probabilities_ = CalculatePriorProbabilities();
+  }
+}
+
+vector<size_t> Model::GetBestClassList() const {
+  return best_class_list;
 }
 
 vector<naivebayes::Image> Model::GetImageList() const {
   return image_list_;
+}
+
+vector<double> Model::CalculatePriorProbabilities() {
+  for(size_t num = 0; num <= 9; num++) {
+    //the number of times a certain number shows up in training labels over total number of training labels
+    double probability_of_num =
+        (kLaplaceSmoothingFactor+ static_cast<double>(std::count(training_label_vec_.begin(), training_label_vec_.end(), num)))
+        /((10*kLaplaceSmoothingFactor)+training_label_vec_.size());
+
+    prior_probabilities_.push_back(probability_of_num);
+  }
+  return prior_probabilities_;
+}
+
+size_t Model::ClassifyImage(naivebayes::Image &image) {
+  double likelihood_score;
+  size_t best_class = 0;
+  double max = -5000.0;
+  for(size_t cl = 0; cl <= 9; cl++) {
+    likelihood_score=log(prior_probabilities_.at(cl));
+    for (size_t r = 0; r < 28; r++) {
+      for (size_t c = 0; c < 28; c++) {
+        if(image.CheckSpace(r, c)) {
+          likelihood_score +=
+              log(1-feature_prob_map_[cl][r][c]);
+        } else likelihood_score +=log(feature_prob_map_[cl][r][c]);
+      }
+    }
+    if(likelihood_score>max) {
+      best_class = cl;
+      max = likelihood_score;
+    }
+  }
+
+  return best_class;
+}
+
+double Model::FindProbabilityOfShadingAtPoint(size_t image_class, std::pair<size_t, size_t> pair) {
+  double numerator;
+  size_t num_shaded_at_point = frequency_map_[image_class][pair.first][pair.second];
+  numerator = kLaplaceSmoothingFactor+(double)num_shaded_at_point;
+  double denominator;
+  denominator = (2*kLaplaceSmoothingFactor)+num_in_class_[image_class];
+  return numerator/denominator;
 }
 
 void Model::InitializeFrequencyMap(size_t frequency_map_size) {
@@ -123,6 +186,8 @@ void Model::AddCurrentImageToList(const vector<char> &char_vec, naivebayes::Imag
     training_image_vec_.push_back(char_vec);
     current_image.SetImageVector(training_image_vec_);
     current_image.SetImageClass(image_class);
+    size_t best_class = ClassifyImage(current_image);
+    best_class_list.push_back(best_class);
     training_image_vec_.clear();
     image_vector_key_++;
     image_list_.push_back(current_image);

@@ -23,11 +23,8 @@ void Image::SetImageClass(size_t image_class) {
   image_class_ = image_class;
 }
 
-void Image::SetBestClass(size_t best_class) {
-  if(best_class>9) {
-    throw std::invalid_argument("Image class input is not a single-digit number");
-  }
-  best_class_ = best_class;
+bool Image::CheckSpace(size_t r, size_t c) const {
+  return (image_vector_[r][c] == ' ');
 }
 
 vector<vector<char>> Image::GetImageVector() const {
@@ -36,9 +33,5 @@ vector<vector<char>> Image::GetImageVector() const {
 
 size_t Image::GetImageClass() const {
   return image_class_;
-}
-
-size_t Image::GetBestClass() const {
-  return best_class_;
 }
 }

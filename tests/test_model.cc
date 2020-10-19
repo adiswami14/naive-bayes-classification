@@ -32,7 +32,6 @@ TEST_CASE("Reading through datasets") {
     naivebayes::Model model;
     ReadTrainingFiles(ifstream, model);
     REQUIRE(model.GetTrainingLabelVec().size() == 5000);
-    REQUIRE(model.GetNumOfImagesInClass(0) == 479);
     REQUIRE(model.GetImageList().size() == 5000);
 
     //make sure initialization of maps makes all value 0
@@ -60,9 +59,6 @@ TEST_CASE("Reading through datasets") {
     ReadTestFiles(ifstream, model);
     REQUIRE(model.GetTrainingLabelVec().size()==3);
     REQUIRE(model.GetImageList().size()==3);
-    REQUIRE(model.GetNumOfImagesInClass(0) ==1);
-    REQUIRE(model.GetNumOfImagesInClass(7) ==1);
-    REQUIRE(model.GetNumOfImagesInClass(4) ==1);
 
     SECTION("Check Training Label Vector") {
       vector<int> training_vec;
@@ -121,6 +117,88 @@ TEST_CASE("Accessing Model Member variables") {
             model.GetImageList().at(0).GetImageVector());
     REQUIRE(v.at(0).GetImageClass() ==
             model.GetImageList().at(0).GetImageClass());
+  }
+}
+
+/*TEST_CASE("Processing Prior Probabilities") {
+  std::ifstream ifstream;
+  naivebayes::Model model(4);
+  model.ReadLabels("data/testinglabel");
+  std::ifstream istream("data/testingimages");
+  while(istream.good()) {
+    istream >> model;
+  }
+  naivebayes::ProbabilityFinder p_finder(model);
+  vector<double> vector = p_finder.CalculatePriorProbabilities();
+
+  SECTION("Testing values in testing labels") {
+    REQUIRE(vector.at(0) == Approx(0.154).epsilon(0.01));
+    REQUIRE(vector.at(7) == Approx(0.154).epsilon(0.01));
+    REQUIRE(vector.at(4) == Approx(0.154).epsilon(0.01));
+  }
+
+  SECTION("Testing values not in testing labels") {
+    REQUIRE(vector.at(1) == Approx(0.077).epsilon(0.01));
+    REQUIRE(vector.at(3) == Approx(0.077).epsilon(0.01));
+    REQUIRE(vector.at(8) == Approx(0.077).epsilon(0.01));
+  }
+}
+
+TEST_CASE("Processing Pixel Probabilities") {
+  std::ifstream ifstream;
+  naivebayes::Model model(4);
+  model.ReadLabels("data/testinglabel");
+  std::ifstream ifstream_images;
+  ifstream_images.open("data/testingimages");
+  while (ifstream_images.good()) {
+    ifstream_images >> model;
+  }
+  naivebayes::ProbabilityFinder p_finder(model);
+  SECTION("Testing values in testing labels") {
+    SECTION("Shaded Pixels") {
+      REQUIRE(p_finder.FindProbabilityOfShadingAtPoint(0, std::make_pair(0, 0)) ==
+              Approx(0.666667).epsilon(0.01));
+      REQUIRE(p_finder.FindProbabilityOfShadingAtPoint(4, std::make_pair(1, 2)) ==
+              Approx(0.666667).epsilon(0.01));
+      REQUIRE(p_finder.FindProbabilityOfShadingAtPoint(7, std::make_pair(0, 0)) ==
+              Approx(0.666667).epsilon(0.01));
+    }
+
+    SECTION("Unshaded Pixels") {
+      REQUIRE(p_finder.FindProbabilityOfShadingAtPoint(7, std::make_pair(3, 2)) ==
+              Approx(0.333333).epsilon(0.01));
+      REQUIRE(p_finder.FindProbabilityOfShadingAtPoint(4, std::make_pair(0, 1)) ==
+              Approx(0.333333).epsilon(0.01));
+      REQUIRE(p_finder.FindProbabilityOfShadingAtPoint(0, std::make_pair(1, 1)) ==
+              Approx(0.333333).epsilon(0.01));
+    }
+  }
+
+  SECTION("Testing values not in testing labels") {
+    REQUIRE(p_finder.FindProbabilityOfShadingAtPoint(3, std::make_pair(0,0)) == Approx(0.5).epsilon(0.01));
+    REQUIRE(p_finder.FindProbabilityOfShadingAtPoint(9, std::make_pair(3,2)) == Approx(0.5).epsilon(0.01));
+  }
+}*/
+
+TEST_CASE("Getting and classifying an image") {
+  naivebayes::Model model;
+  model.ReadLabels("mnistdatatraining/traininglabels");
+  std::ifstream ifstream_images;
+  ifstream_images.open("mnistdatatraining/trainingimages");
+  while (ifstream_images.good()) {
+    ifstream_images >> model;
+  }
+  SECTION("Classifying Images") {
+    naivebayes::Model model1;
+    model1.ReadLabels("mnistdatavalidation/testlabels");
+    std::ifstream ifstream;
+    ifstream.open("mnistdatavalidation/testimages");
+    while (ifstream.good()) {
+      ifstream >> model1;
+    }
+    model1.GetImageList();
+    //REQUIRE(p_finder.ClassifyImage(trainingSet.GetTestingImageList().at(1))==trainingSet.GetTestingLabelList().at(1));
+    //REQUIRE(p_finder.ClassifyImage(trainingSet.GetTestingImageList().at(2))==trainingSet.GetTestingLabelList().at(2));
   }
 }
 

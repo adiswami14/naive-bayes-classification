@@ -1,5 +1,4 @@
 #include <core/image.h>
-
 #include <string>
 #include <vector>
 
@@ -50,6 +49,14 @@ class Model {
 
   size_t curr_row_; //tracks current row of the image to be scanned
 
+  vector<double> prior_probabilities_;
+
+  vector<size_t> num_in_class_;
+
+  std::map<size_t, vector<vector<double>>> feature_prob_map_;
+
+  vector<size_t> best_class_list;
+
  public:
   //The Laplacian constant for training the model
   size_t kLaplaceSmoothingFactor = 1;
@@ -65,11 +72,7 @@ class Model {
    */
   Model(size_t frequency_map_size);
 
-  /**
-   * Just returns "CS 126" for now
-   * @return The class with the highest chance of which an image belongs to
-   */
-  std::string GetBestClass() const;
+  Model(std::map<size_t, vector<vector<double>>> map);
 
   /**
    * Overloads the >> operator for a given image
@@ -96,7 +99,9 @@ class Model {
    * @param class_num The number of the class
    * @return The number of training images in a certain class
    */
-  size_t GetNumOfImagesInClass(size_t class_num) const;
+  void SetNumOfImagesInClass();
+
+  vector<size_t> GetNumOfImagesInClass() const;
 
   /**
    * Sets value of frequency_map_ variable to variable passed in
@@ -127,5 +132,13 @@ class Model {
    * @param filename The file name of the training labels file
    */
   void ReadLabels(const string &filename);
+
+  size_t ClassifyImage(naivebayes::Image &image);
+
+  double FindProbabilityOfShadingAtPoint(size_t image_class, std::pair<size_t, size_t> pair);
+
+  vector<double> CalculatePriorProbabilities();
+
+  vector<size_t> GetBestClassList() const;
 };
 }  // namespace naivebayes

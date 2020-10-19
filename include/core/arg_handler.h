@@ -5,9 +5,9 @@
 #ifndef NAIVE_BAYES_ARG_HANDLER_H
 #define NAIVE_BAYES_ARG_HANDLER_H
 
-
 #include <vector>
-#include "probability_finder.h"
+
+#include "model.h"
 
 namespace naivebayes { //TODO: Carefully look through cc file and javadoc
 
@@ -39,7 +39,7 @@ class ArgHandler {
    * @param model Instance of Model containing all data for all images
    * @param prior_probabilities A vector of all prior probabilities corresponding to each class of images
    */
-  void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::ProbabilityFinder &pf, vector<double> prior_probabilities);
+  void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Model &model, vector<double> prior_probabilities);
 
   /**
    * Parses through list of all commands and calls the according functions
@@ -47,13 +47,15 @@ class ArgHandler {
    * @param pf Current instance of ProbabilityFinder
    * @param model Current instance of Model class
    */
-  void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::ProbabilityFinder &pf, naivebayes::Model &model);
+  void RunCommandLineFunctions(const vector<string> &all_args, naivebayes::Model &model);
 
   /**
    * Initializes loaded_feature_prob_map_ to all 0s
    * @param feature_prob_map_size The desired size of each Image in map
    */
   void InitializeLoadedFeatureProbMap(size_t feature_prob_map_size);
+
+  void LoadFile(const string& filename);
 
   vector<double> loaded_prior_probabilities_; //vector of prior probabilities for each class loaded in
 
