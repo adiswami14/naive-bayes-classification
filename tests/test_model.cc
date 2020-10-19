@@ -182,7 +182,30 @@ TEST_CASE("Processing Pixel Probabilities") {
   }
 }
 
-TEST_CASE("Getting and classifying an image") {
+TEST_CASE("Classifying Images from Small Dataset") {
+  naivebayes::Model model(4);
+  model.ReadLabels("data/testinglabel");
+  std::ifstream ifstream_images;
+  ifstream_images.open("data/testingimages");
+  while (ifstream_images.good()) {
+    ifstream_images >> model;
+  }
+  SECTION("Classifying images") {
+    naivebayes::Model model1(4, model.GetFeatureProbMap());
+    model1.ReadLabels("data/dataset_labels");
+    std::ifstream ifstream;
+    ifstream.open("data/dataset_images");
+    while (ifstream.good()) {
+      ifstream >> model1;
+    }
+    vector<size_t> best_class_list = model1.GetBestClassList();
+    REQUIRE(best_class_list[0] == model1.GetTrainingLabelVec()[0]);
+    REQUIRE(best_class_list[1] == model1.GetTrainingLabelVec()[1]);
+    REQUIRE(best_class_list[2] == model1.GetTrainingLabelVec()[2]);
+  }
+}
+
+TEST_CASE("Classifying Image Sanity Check") {
   naivebayes::Model model;
   model.ReadLabels("mnistdatatraining/traininglabels");
   std::ifstream ifstream_images;
@@ -190,7 +213,7 @@ TEST_CASE("Getting and classifying an image") {
   while (ifstream_images.good()) {
     ifstream_images >> model;
   }
-  SECTION("Classifying Images") {
+  SECTION("Get Overall Accuracy of Tests") {
     naivebayes::Model model1(model.GetFeatureProbMap());
     model1.ReadLabels("mnistdatavalidation/testlabels");
     std::ifstream ifstream;

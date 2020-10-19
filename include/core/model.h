@@ -28,6 +28,8 @@ class Model {
 
   Model(std::map<size_t, vector<vector<double>>> map);
 
+  Model(size_t image_dim, std::map<size_t, vector<vector<double>>> map);
+
   /**
    * Overloads the >> operator for a given image
    * @param istream The input stream given

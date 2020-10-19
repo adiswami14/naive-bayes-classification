@@ -40,6 +40,16 @@ Model::Model(std::map<size_t, vector<vector<double>>> map) {
   prob_map_set_ = true;
 }
 
+Model::Model(size_t image_dim, std::map<size_t, vector<vector<double>>> map) {
+  InitializeFrequencyMap(image_dim);
+  image_vector_key_=0;
+  curr_row_=0;
+  num_in_class_ = vector<size_t>(10, 0);
+  feature_prob_map_ = map;
+  image_dim_ = image_dim;
+  prob_map_set_ = true;
+}
+
 std::istream &operator >>(std::istream &istream, Model& model) {
   naivebayes::Image current_image;
   string s;
