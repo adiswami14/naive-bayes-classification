@@ -63,6 +63,7 @@ void ArgHandler::RunCommandLineFunctions(const vector<string> &all_args, naiveba
         ofstream.open(all_args[4]); // data/probabilities
         WriteProbabilitiesToFile(ofstream,model, prior_probabilities);
       }
+
     } else if(all_args.size()==6) {
       if(all_args[3] == "test") {
         loaded_feature_prob_map_ = model.GetFeatureProbMap();

@@ -149,7 +149,7 @@ std::map<size_t, vector<vector<double>>> Model::GetFeatureProbMap() const {
   return feature_prob_map_;
 }
 
-size_t Model::ClassifyImage(naivebayes::Image &image) {
+size_t Model::ClassifyImage(Image &image) {
   double likelihood_score;
   size_t best_class = 0;
   double max = -5000.0;

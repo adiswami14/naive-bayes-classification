@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "model.h"
+#include <core/model.h>
 
 namespace naivebayes { //TODO: Carefully look through cc file and javadoc
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <core/model.h>
+
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -24,13 +26,14 @@ class NaiveBayesApp : public ci::app::App {
 
   // TODO: Delete this comment. Feel free to play around with these variables
   // provided that you can see the entire UI on your screen.
-  const double kWindowSize = 875;
-  const double kMargin = 100;
+  const double kWindowSize = 475;
+  const double kMargin = 50;
   const size_t kImageDimension = 28;
 
  private:
   Sketchpad sketchpad_;
   int current_prediction_ = -1;
+  Model model_;
 };
 
 }  // namespace visualizer

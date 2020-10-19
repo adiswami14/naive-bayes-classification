@@ -122,7 +122,7 @@ class Model {
    * @param image The instance of Image to classify
    * @return The class that best fits the image
    */
-  size_t ClassifyImage(naivebayes::Image &image);
+  size_t ClassifyImage(Image &image);
 
   /**
    * Finds probability of finding shading for a class of image at a specific point

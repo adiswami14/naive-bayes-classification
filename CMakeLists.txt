@@ -62,7 +62,7 @@ target_include_directories(train-model PRIVATE include)
 ci_make_app(
         APP_NAME        sketchpad-classifier
         CINDER_PATH     ${CINDER_PATH}
-        SOURCES         apps/cinder_app_main.cc ${SOURCE_FILES}
+        SOURCES         apps/cinder_app_main.cc ${SOURCE_FILES} src/core/image.cc include/core/image.h src/core/arg_handler.cc include/core/arg_handler.h
         INCLUDES        include
 )
 
