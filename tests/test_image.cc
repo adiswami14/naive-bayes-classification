@@ -7,7 +7,6 @@ using std::vector;
 TEST_CASE("Accessing Image member variables"){
   SECTION("Accessing Image Vector") {
     naivebayes::Image image;
-    REQUIRE_THROWS_AS(image.SetImageVector(vector<vector<char>>()), std::invalid_argument);
     vector<char> vec (3, 0);
     vector<vector<char>> vec_2d;
     vec_2d.push_back(vec);

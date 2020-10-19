@@ -10,9 +10,6 @@ Image::Image(){
 }
 
 void Image::SetImageVector(const vector<vector<char>> &image_vector) {
-  if(image_vector.empty()) {
-    throw std::invalid_argument("Image vector given as input is empty");
-  }
   image_vector_ = image_vector;
 }
 

@@ -49,9 +49,15 @@ class Image {
    */
   size_t GetImageClass() const;
 
+  /**
+   * Checks if a character of the image, given a certain position, is a space
+   * @param r The row position of the character in image_vector_
+   * @param c The column position of the character in image_vector_
+   * @return Whether the character in image_vector_ at the specific position is a space
+   */
   bool CheckSpace(size_t r, size_t c) const;
  private:
-  //vector of a single image
+  //vector of characters in a single image
   vector<vector<char>> image_vector_;
 
   //class of given image

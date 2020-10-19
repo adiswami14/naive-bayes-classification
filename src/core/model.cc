@@ -20,13 +20,13 @@ Model::Model() {
   prob_map_set_ = false;
 }
 
-Model::Model(size_t frequency_map_size) {
-  InitializeFrequencyMap(frequency_map_size);
-  InitializeFeatureProbMap(frequency_map_size);
+Model::Model(size_t image_dim) {
+  InitializeFrequencyMap(image_dim);
+  InitializeFeatureProbMap(image_dim);
   image_vector_key_=0;
   curr_row_=0;
   num_in_class_ = vector<size_t>(10, 0);
-  image_dim_ = frequency_map_size;
+  image_dim_ = image_dim;
   prob_map_set_ = false;
 }
 
