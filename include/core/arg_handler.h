@@ -28,7 +28,7 @@ class ArgHandler {
    */
   void ProcessCommandLineArgs(int argc, char *argv[], naivebayes::Model &model);
 
-  map<size_t, vector<vector<double>>> GetLoadedFrequencyMap();
+  map<size_t, vector<vector<double>>> GetLoadedFeatureProbMap();
 
   vector<double> GetLoadedPriorProbabilities();
  private:
@@ -57,7 +57,7 @@ class ArgHandler {
 
   void LoadFile(const string& filename);
 
-  void TestModel() const;
+  void TestModel(const string& test_label_file, const string& test_image_file, std::map<size_t, vector<vector<double>>> &map) const;
 
   vector<double> loaded_prior_probabilities_; //vector of prior probabilities for each class loaded in
 

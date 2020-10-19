@@ -59,31 +59,44 @@ TEST_CASE("Processing Command Line Arguments") {
     argv = const_cast<char**>(n_argv2);
     REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(8, argv, model), std::invalid_argument);
   }
+  SECTION("Training and testing model") {
+    //valid training and saving arguments
+    naivebayes::ArgHandler argHandler1;
+    naivebayes::Model model1;
+    const char* n_argv[] = {"filename", "train", "mnistdatatraining/traininglabels",
+                            "mnistdatatraining/trainingimages", "test",
+                            "mnistdatavalidation/testlabels", "mnistdatavalidation/testimage"};
+    argv = const_cast<char**>(n_argv);
+    argHandler1.ProcessCommandLineArgs(7, argv, model1);
+    REQUIRE(model1.GetTrainingLabelVec().size() == 5000);
+    map<size_t, vector<vector<double>>> map = argHandler1.GetLoadedFeatureProbMap();
+    REQUIRE(map[0][0][0] == Approx(0.002079).epsilon(0.01));
+    REQUIRE(map[7][27][14] == Approx(0.0452899).epsilon(0.01));
+  }
   SECTION("Loading model") {
     //valid loading arguments
-    const char* n_argv[] = {"filename","load", "data/test_probs"};
+    naivebayes::ArgHandler argHandler1;
+    naivebayes::Model model1;
+    const char* n_argv[] = {"filename","load", "data/probabilities", "test", "mnistdatavalidation/testlabels", "mnistdatavalidation/testimages"};
     argv = const_cast<char**>(n_argv);
-    argHandler.ProcessCommandLineArgs(3, argv, model);
-    vector<double> loaded_prior_probs = argHandler.GetLoadedPriorProbabilities();
-    map<size_t, vector<vector<double>>> m = argHandler.GetLoadedFrequencyMap();
-    REQUIRE(loaded_prior_probs.at(0) == Approx(0.154).epsilon(0.01));
-    REQUIRE(loaded_prior_probs.at(7) == Approx(0.154).epsilon(0.01));
-    REQUIRE(loaded_prior_probs.at(4) == Approx(0.154).epsilon(0.01));
-    REQUIRE(loaded_prior_probs.at(1) == Approx(0.077).epsilon(0.01));
-    REQUIRE(loaded_prior_probs.at(9) == Approx(0.077).epsilon(0.01));
-    REQUIRE(m[0][0][0] == Approx(0.66666667).epsilon(0.01));
-    REQUIRE(m[0][1][1] == Approx(0.33333333).epsilon(0.01));
-    REQUIRE(m[7][0][0] == Approx(0.66666667).epsilon(0.01));
-    REQUIRE(m[1][2][1] == Approx(0.5).epsilon(0.01));
+    argHandler1.ProcessCommandLineArgs(6, argv, model1);
+    vector<double> loaded_prior_probs = argHandler1.GetLoadedPriorProbabilities();
+    map<size_t, vector<vector<double>>> m = argHandler1.GetLoadedFeatureProbMap();
+    REQUIRE(loaded_prior_probs.at(0) == Approx(0.0958084).epsilon(0.01));
+    REQUIRE(loaded_prior_probs.at(7) == Approx(0.10998).epsilon(0.01));
+    REQUIRE(loaded_prior_probs.at(1) == Approx(0.112575).epsilon(0.01));
+    REQUIRE(loaded_prior_probs.at(9) == Approx(0.099002).epsilon(0.01));
+    REQUIRE(m[0][0][0] == Approx(0.002079).epsilon(0.01));
+    REQUIRE(m[1][2][1] == Approx(0.00176991).epsilon(0.01));
 
     //Argument that's too short
-    const char* n_argv1[] = {"filename","load"};
+    const char* n_argv1[] = {"filename","load", "data/probs"};
     argv = const_cast<char**>(n_argv1);
-    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(2, argv, model), std::invalid_argument);
+    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(3, argv, model), std::invalid_argument);
 
     //Argument that's too long
-    const char* n_argv2[] = {"filename","load", "extra", "argument"};
+    const char* n_argv2[] = {"filename","load", "data/probs", "test", "filename", "filename", "extra_argument"};
     argv = const_cast<char**>(n_argv2);
-    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(2, argv, model), std::invalid_argument);
+    REQUIRE_THROWS_AS(argHandler.ProcessCommandLineArgs(7, argv, model), std::invalid_argument);
   }
 }

@@ -22,7 +22,7 @@ vector<double> ArgHandler::GetLoadedPriorProbabilities() {
   return loaded_prior_probabilities_;
 }
 
-map<size_t, vector<vector<double>>> ArgHandler::GetLoadedFrequencyMap() {
+map<size_t, vector<vector<double>>> ArgHandler::GetLoadedFeatureProbMap() {
   return loaded_feature_prob_map_;
 }
 
@@ -47,28 +47,34 @@ void ArgHandler::RunCommandLineFunctions(const vector<string> &all_args, naiveba
 
   //train TrainingLabelsName TrainingImagesName save FileToWriteTo
   if(all_args[0] == "train") {
+    model.ReadLabels(all_args[1]);
+
+    //read through training images
+    std::ifstream ifstream_images;
+    ifstream_images.open(all_args[2]); // mnistdatatraining/trainingimages
+    while(ifstream_images.good()) {
+      ifstream_images>> model;
+    }
+
+    vector<double> prior_probabilities = model.GetPriorProbabilities();
     if(all_args.size() == 5) {
-      model.ReadLabels(all_args[1]);
-
-      //read through training images
-      std::ifstream ifstream_images;
-      ifstream_images.open(all_args[2]); // mnistdatatraining/trainingimages
-      while(ifstream_images.good()) {
-        ifstream_images>> model;
-      }
-
-      vector<double> prior_probabilities = model.GetPriorProbabilities();
       if (all_args[3] == "save") {
         //saves model to file
         ofstream.open(all_args[4]); // data/probabilities
         WriteProbabilitiesToFile(ofstream,model, prior_probabilities);
       }
-
+    } else if(all_args.size()==6) {
+      if(all_args[3] == "test") {
+        loaded_feature_prob_map_ = model.GetFeatureProbMap();
+        TestModel(all_args[4], all_args[5], loaded_feature_prob_map_);
+      }
     } else throw std::invalid_argument("Invalid amount of command line args. Please try again.");
-  } else if(all_args[0] == "load") {  //load FileToLoadUp
-    if(all_args.size() == 2) {
+  } else if(all_args[0] == "load") {  //load FileToLoadUp test TestLabelFile TestImageFile
+    if(all_args.size() == 5) {
       LoadFile(all_args[1]);
-      //TestModel();
+      if(all_args[2] == "test") {
+        TestModel(all_args[3], all_args[4], loaded_feature_prob_map_);
+      }
     } else throw std::invalid_argument("Invalid amount of command line args. Please try again.");
   } else {
     throw std::invalid_argument("Invalid command line arg. Please try again.");
@@ -85,21 +91,22 @@ void ArgHandler::ProcessCommandLineArgs(int argc, char *argv[], naivebayes::Mode
   RunCommandLineFunctions(all_args, model);
 }
 
-void ArgHandler::TestModel() const {
-  naivebayes::Model m(loaded_feature_prob_map_);
-  m.ReadLabels("mnistdatavalidation/testlabels");
+void ArgHandler::TestModel(const string& test_label_file, const string& test_image_file, std::map<size_t, vector<vector<double>>> &map) const{
+  naivebayes::Model m(map);
+  m.ReadLabels(test_label_file);
   std::ifstream test;
-  test.open("mnistdatavalidation/testimages");
+  test.open(test_image_file);
   while(test.good()) {
     test>>m;
   }
   size_t matches = 0;
   vector<size_t> v = m.GetBestClassList();
-  for(int x=0;x<1000;x++) {
+  for(int x=0;x<v.size();x++) {
     if(v.at(x) == m.GetTrainingLabelVec().at(x))
       matches++;
   }
-  std::cout<<matches<<std::endl;
+  std::cout<<"Your test images have been classified correctly "
+            <<((double)matches/v.size())*100.0<<"% of the time!"<<std::endl;
 }
 
 void ArgHandler::LoadFile(const string &filename) {
