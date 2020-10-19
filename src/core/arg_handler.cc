@@ -48,7 +48,6 @@ void ArgHandler::RunCommandLineFunctions(const vector<string> &all_args, naiveba
   //train TrainingLabelsName TrainingImagesName save FileToWriteTo
   if(all_args[0] == "train") {
     if(all_args.size() == 5) {
-      //ifstream.open(all_args[1]); // mnistdatatraining/traininglabels
       model.ReadLabels(all_args[1]);
 
       //read through training images
@@ -57,35 +56,50 @@ void ArgHandler::RunCommandLineFunctions(const vector<string> &all_args, naiveba
       while(ifstream_images.good()) {
         ifstream_images>> model;
       }
-      vector<double> prior_probabilities = model.CalculatePriorProbabilities();
+
+      vector<double> prior_probabilities = model.GetPriorProbabilities();
       if (all_args[3] == "save") {
         //saves model to file
         ofstream.open(all_args[4]); // data/probabilities
-        WriteProbabilitiesToFile(ofstream,model,prior_probabilities);
+        WriteProbabilitiesToFile(ofstream,model, prior_probabilities);
       }
 
     } else throw std::invalid_argument("Invalid amount of command line args. Please try again.");
   } else if(all_args[0] == "load") {  //load FileToLoadUp
     if(all_args.size() == 2) {
       LoadFile(all_args[1]);
-      naivebayes::Model m(loaded_feature_prob_map_);
-      m.ReadLabels("mnistdatavalidation/testlabels");
-      std::ifstream test;
-      test.open("mnistdatavalidation/testimages");
-      while(test.good()) {
-        test>>m;
-      }
-      size_t matches = 0;
-      vector<size_t> v = m.GetBestClassList();
-      for(int x=0;x<1000;x++) {
-        if(v.at(x) == m.GetTrainingLabelVec().at(x))
-          matches++;
-      }
-      std::cout<<matches<<std::endl;
+      //TestModel();
     } else throw std::invalid_argument("Invalid amount of command line args. Please try again.");
   } else {
     throw std::invalid_argument("Invalid command line arg. Please try again.");
   }
+}
+
+//https://stackoverflow.com/questions/15344714/convert-command-line-argument-to-string
+void ArgHandler::ProcessCommandLineArgs(int argc, char *argv[], naivebayes::Model &model) {
+  //vector of strings consisting of all args passed in (not counting file name)
+  vector<string> all_args;
+  if (argc > 1) {
+    all_args.assign(argv + 1, argv + argc);
+  }
+  RunCommandLineFunctions(all_args, model);
+}
+
+void ArgHandler::TestModel() const {
+  naivebayes::Model m(loaded_feature_prob_map_);
+  m.ReadLabels("mnistdatavalidation/testlabels");
+  std::ifstream test;
+  test.open("mnistdatavalidation/testimages");
+  while(test.good()) {
+    test>>m;
+  }
+  size_t matches = 0;
+  vector<size_t> v = m.GetBestClassList();
+  for(int x=0;x<1000;x++) {
+    if(v.at(x) == m.GetTrainingLabelVec().at(x))
+      matches++;
+  }
+  std::cout<<matches<<std::endl;
 }
 
 void ArgHandler::LoadFile(const string &filename) {
@@ -105,16 +119,6 @@ void ArgHandler::LoadFile(const string &filename) {
     curr_class= cl;
     loaded_feature_prob_map_[cl][x][y] = feature_prob_at_point;
   }
-}
-
-//https://stackoverflow.com/questions/15344714/convert-command-line-argument-to-string
-void ArgHandler::ProcessCommandLineArgs(int argc, char *argv[], naivebayes::Model &model) {
-  //vector of strings consisting of all args passed in (not counting file name)
-  vector<string> all_args;
-  if (argc > 1) {
-    all_args.assign(argv + 1, argv + argc);
-  }
-  RunCommandLineFunctions(all_args, model);
 }
 
 void ArgHandler::InitializeLoadedFeatureProbMap(size_t frequency_map_size) {

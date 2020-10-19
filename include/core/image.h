@@ -18,12 +18,6 @@ using std::map;
  * Corresponds to a single image from the training data set, used to rasterize characters
  */
 class Image {
- private:
-  //vector of a single image
-  vector<vector<char>> image_vector_;
-
-  //class of given image
-  size_t image_class_;
  public:
 
   /**
@@ -56,6 +50,12 @@ class Image {
   size_t GetImageClass() const;
 
   bool CheckSpace(size_t r, size_t c) const;
+ private:
+  //vector of a single image
+  vector<vector<char>> image_vector_;
+
+  //class of given image
+  size_t image_class_;
 };
 } //namespace naivebayes
 

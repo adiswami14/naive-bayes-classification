@@ -11,55 +11,9 @@ using std::string;
  * Stores all the data for all the images, including all the training dataset variables
  */
 class Model {
- private:
-  /**
-   * Updates frequency_map_ variable with new pixels for a certain class
-   * @param s The string representing the current line of the text file
-   * @param image_class The class of the current Raster image
-   */
-  void UpdateFrequencyMap(const string& s, size_t image_class);
-
-  /**
-   * Adds current image to image_list_ variable
-   * @param char_vec The current vector of characters in the current line of the text file
-   * @param current_image The current image
-   * @param image_class The class of the current image
-   */
-  void AddCurrentImageToList(const vector<char> &char_vec, naivebayes::Image &current_image, size_t image_class);
-
-  /**
-   * Initializes frequency_map_ variable to all zeros
-   * @param frequency_map_size The desired size of the frequency map
-   */
-  void InitializeFrequencyMap(size_t frequency_map_size);
-
-  //vector that stores all the training labels
-  vector<int> training_label_vec_;
-
-  //2d vector that stores all images in training dataset
-  vector<vector<char>> training_image_vec_;
-
-  //vector of all Images
-  vector<naivebayes::Image> image_list_;
-
-  //map that stores a 2d-vector of how many times a certain pixel is shaded corresponding to each class of image
-  map<size_t, vector<vector<size_t>>> frequency_map_;
-
-  size_t image_vector_key_; //tracks current key of image corresponding to training label
-
-  size_t curr_row_; //tracks current row of the image to be scanned
-
-  vector<double> prior_probabilities_;
-
-  vector<size_t> num_in_class_;
-
-  std::map<size_t, vector<vector<double>>> feature_prob_map_;
-
-  vector<size_t> best_class_list;
-
  public:
   //The Laplacian constant for training the model
-  size_t kLaplaceSmoothingFactor = 1;
+  const size_t kLaplaceSmoothingFactor = 1;
 
   /**
    * Default constructor of the Model class
@@ -99,10 +53,11 @@ class Model {
    * @param class_num The number of the class
    * @return The number of training images in a certain class
    */
-  void SetNumOfImagesInClass();
+  void AddNumOfImagesInClass();
 
   vector<size_t> GetNumOfImagesInClass() const;
 
+  vector<double> GetPriorProbabilities() const;
   /**
    * Sets value of frequency_map_ variable to variable passed in
    * @param frequency_map The map tracking frequency of shading at each class
@@ -140,5 +95,61 @@ class Model {
   vector<double> CalculatePriorProbabilities();
 
   vector<size_t> GetBestClassList() const;
+
+  std::map<size_t, vector<vector<double>>> GetFeatureProbMap() const;
+ private:
+  /**
+   * Updates frequency_map_ variable with new pixels for a certain class
+   * @param s The string representing the current line of the text file
+   * @param image_class The class of the current Raster image
+   */
+  void UpdateFrequencyMap(const string& s, size_t image_class);
+
+  void UpdateFeatureProbMap(size_t image_class);
+
+  /**
+   * Adds current image to image_list_ variable
+   * @param char_vec The current vector of characters in the current line of the text file
+   * @param current_image The current image
+   * @param image_class The class of the current image
+   */
+  void AddCurrentImageToList(const vector<char> &char_vec, naivebayes::Image &current_image, size_t image_class);
+
+  /**
+   * Initializes frequency_map_ variable to all zeros
+   * @param frequency_map_size The desired size of the frequency map
+   */
+  void InitializeFrequencyMap(size_t frequency_map_size);
+
+  void InitializeFeatureProbMap(size_t feature_prob_map_size);
+
+  //vector that stores all the training labels
+  vector<int> training_label_vec_;
+
+  //2d vector that stores all images in training dataset
+  vector<vector<char>> training_image_vec_;
+
+  //vector of all Images
+  vector<naivebayes::Image> image_list_;
+
+  //map that stores a 2d-vector of how many times a certain pixel is shaded corresponding to each class of image
+  map<size_t, vector<vector<size_t>>> frequency_map_;
+
+  size_t image_vector_key_; //tracks current key of image corresponding to training label
+
+  size_t curr_row_; //tracks current row of the image to be scanned
+
+  vector<double> prior_probabilities_;
+
+  vector<size_t> num_in_class_;
+
+  std::map<size_t, vector<vector<double>>> feature_prob_map_;
+
+  vector<size_t> best_class_list;
+
+  size_t image_dim_;
+
+  bool prob_map_set_;
+
 };
 }  // namespace naivebayes

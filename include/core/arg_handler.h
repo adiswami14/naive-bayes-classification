@@ -57,6 +57,8 @@ class ArgHandler {
 
   void LoadFile(const string& filename);
 
+  void TestModel() const;
+
   vector<double> loaded_prior_probabilities_; //vector of prior probabilities for each class loaded in
 
   map<size_t, vector<vector<double>>> loaded_feature_prob_map_; //map of feature probabilities at each pixel;

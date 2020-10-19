@@ -12,16 +12,22 @@ using std::string;
 Model::Model() {
   //default 28x28 grid
   InitializeFrequencyMap(28);
+  InitializeFeatureProbMap(28);
   image_vector_key_=0;
   curr_row_=0;
   num_in_class_ = vector<size_t>(10, 0);
+  image_dim_ = 28;
+  prob_map_set_ = false;
 }
 
 Model::Model(size_t frequency_map_size) {
   InitializeFrequencyMap(frequency_map_size);
+  InitializeFeatureProbMap(frequency_map_size);
   image_vector_key_=0;
   curr_row_=0;
   num_in_class_ = vector<size_t>(10, 0);
+  image_dim_ = frequency_map_size;
+  prob_map_set_ = false;
 }
 
 Model::Model(std::map<size_t, vector<vector<double>>> map) {
@@ -30,6 +36,8 @@ Model::Model(std::map<size_t, vector<vector<double>>> map) {
   curr_row_=0;
   num_in_class_ = vector<size_t>(10, 0);
   feature_prob_map_ = map;
+  image_dim_ = 28;
+  prob_map_set_ = true;
 }
 
 std::istream &operator >>(std::istream &istream, Model& model) {
@@ -62,13 +70,13 @@ vector<int> Model::GetTrainingLabelVec() const{
   return training_label_vec_;
 }
 
-void Model::SetNumOfImagesInClass(){
+void Model::AddNumOfImagesInClass(){
   for(int x=0;x<=9;x++) {
     num_in_class_[x] = std::count(training_label_vec_.begin(), training_label_vec_.end(), x);
   }
 }
 
-vector<size_t> Model::GetNumOfImagesInClass() const {
+vector<size_t> Model::GetNumOfImagesInClass() const{
   return num_in_class_;
 }
 
@@ -98,6 +106,7 @@ void Model::ReadLabels(const string &filename) {
     training_label_vec_.push_back(training_val);
   }
   if(istream.eof()) {
+    AddNumOfImagesInClass();
     prior_probabilities_ = CalculatePriorProbabilities();
   }
 }
@@ -122,14 +131,22 @@ vector<double> Model::CalculatePriorProbabilities() {
   return prior_probabilities_;
 }
 
+vector<double> Model::GetPriorProbabilities() const {
+  return prior_probabilities_;
+}
+
+std::map<size_t, vector<vector<double>>> Model::GetFeatureProbMap() const {
+  return feature_prob_map_;
+}
+
 size_t Model::ClassifyImage(naivebayes::Image &image) {
   double likelihood_score;
   size_t best_class = 0;
   double max = -5000.0;
   for(size_t cl = 0; cl <= 9; cl++) {
     likelihood_score=log(prior_probabilities_.at(cl));
-    for (size_t r = 0; r < 28; r++) {
-      for (size_t c = 0; c < 28; c++) {
+    for (size_t r = 0; r < image_dim_; r++) {
+      for (size_t c = 0; c < image_dim_; c++) {
         if(image.CheckSpace(r, c)) {
           likelihood_score +=
               log(1-feature_prob_map_[cl][r][c]);
@@ -171,11 +188,37 @@ void Model::InitializeFrequencyMap(size_t frequency_map_size) {
 
 }
 
+void Model::InitializeFeatureProbMap(size_t feature_prob_map_size) {
+  vector<vector<double>> vec_big;
+  vector<double> vec_small;
+
+  for(size_t cl = 0; cl <= 9; cl++) {
+    for (size_t x = 0; x < feature_prob_map_size; x++) {
+      for (size_t y = 0; y < feature_prob_map_size; y++) {
+        vec_small.push_back(0.0);
+      }
+      vec_big.push_back(vec_small);
+      vec_small.clear();
+    }
+    feature_prob_map_[cl] = vec_big;
+    vec_big.clear();
+  }
+
+}
+
 void Model::UpdateFrequencyMap(const string& s, size_t image_class) {
   for(size_t pos =0; pos<s.length();pos++) {
     char ch = s.at(pos);
     if (!isspace(ch)) {
       frequency_map_[image_class][curr_row_][pos]++;
+    }
+  }
+}
+
+void Model::UpdateFeatureProbMap(size_t image_class) {
+  for (size_t x = 0; x < image_dim_; x++) {
+    for (size_t y = 0; y < image_dim_; y++) {
+      feature_prob_map_[image_class][x][y] = FindProbabilityOfShadingAtPoint(image_class, std::make_pair(x, y));
     }
   }
 }
@@ -186,6 +229,9 @@ void Model::AddCurrentImageToList(const vector<char> &char_vec, naivebayes::Imag
     training_image_vec_.push_back(char_vec);
     current_image.SetImageVector(training_image_vec_);
     current_image.SetImageClass(image_class);
+    if(!prob_map_set_) {
+      UpdateFeatureProbMap(image_class);
+    }
     size_t best_class = ClassifyImage(current_image);
     best_class_list.push_back(best_class);
     training_image_vec_.clear();
