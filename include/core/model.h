@@ -100,14 +100,14 @@ class Model {
   vector<naivebayes::Image> GetImageList() const;
 
   /**
-   *
-   * @return
+   * Gets the list of image classifications based on their position in image list
+   * @return Vector of image classifications
    */
   vector<size_t> GetBestClassList() const;
 
   /**
-   *
-   * @return
+   * Gets the feature_prob_map_ variable
+   * @return The map of feature probabilities at each pixel corresponding to each class
    */
   std::map<size_t, vector<vector<double>>> GetFeatureProbMap() const;
 

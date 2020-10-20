@@ -85,6 +85,13 @@ class ArgHandler {
    */
   void TestModel(const string& test_label_file, const string& test_image_file, const std::map<size_t, vector<vector<double>>> &map) const;
 
+  /**
+   * Writes probabilities to file after training
+   * @param ofstream Output stream to write to file
+   * @param filename Name of file to write to
+   * @param model Instance of trained model
+   * @param prior_probabilities List of prior probabilities
+   */
   void SaveToFile(std::ofstream &ofstream, const string &filename, Model &model, const vector<double> &prior_probabilities);
 
   vector<double> loaded_prior_probabilities_; //vector of prior probabilities for each class loaded in
