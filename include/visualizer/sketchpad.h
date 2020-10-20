@@ -51,7 +51,15 @@ class Sketchpad {
    */
   void Clear();
 
+  /**
+   * @return Current image instance
+   */
   Image GetImage();
+
+  /**
+   * Sets curr_image_vector_ to all spaces
+   */
+  void InitializeCurrImageVector();
  private:
   glm::vec2 top_left_corner_;
 
@@ -62,9 +70,9 @@ class Sketchpad {
 
   double brush_radius_;
 
-  naivebayes::Image image_;
+  naivebayes::Image image_; //the current image instance to be drawn
 
-  vector<vector<char>> curr_image_vector_;
+  vector<vector<char>> curr_image_vector_; //vector of chars to set as image vector
 };
 
 }  // namespace visualizer

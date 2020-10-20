@@ -33,7 +33,7 @@ class NaiveBayesApp : public ci::app::App {
  private:
   Sketchpad sketchpad_;
   int current_prediction_ = -1;
-  Model model_;
+  Model model_; //model to train and classify images
 };
 
 }  // namespace visualizer

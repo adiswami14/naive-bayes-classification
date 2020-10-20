@@ -55,7 +55,7 @@ class Image {
    * @param c The column position of the character in image_vector_
    * @return Whether the character in image_vector_ at the specific position is a space
    */
-  bool CheckSpace(size_t r, size_t c) const;
+  bool IsSpace(size_t r, size_t c) const;
  private:
   //vector of characters in a single image
   vector<vector<char>> image_vector_;

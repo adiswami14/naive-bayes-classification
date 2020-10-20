@@ -56,7 +56,7 @@ class ArgHandler {
    * @param model Instance of Model containing all data for all images
    * @param prior_probabilities A vector of all prior probabilities corresponding to each class of images
    */
-  void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Model &model, vector<double> prior_probabilities);
+  void WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Model &model, const vector<double> &prior_probabilities);
 
   /**
    * Parses through list of all commands and calls the according functions
@@ -83,7 +83,9 @@ class ArgHandler {
    * @param test_image_file Name of file of test images
    * @param map Feature probability map of trained model
    */
-  void TestModel(const string& test_label_file, const string& test_image_file, std::map<size_t, vector<vector<double>>> &map) const;
+  void TestModel(const string& test_label_file, const string& test_image_file, const std::map<size_t, vector<vector<double>>> &map) const;
+
+  void SaveToFile(std::ofstream &ofstream, const string &filename, Model &model, const vector<double> &prior_probabilities);
 
   vector<double> loaded_prior_probabilities_; //vector of prior probabilities for each class loaded in
 

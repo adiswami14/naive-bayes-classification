@@ -82,6 +82,7 @@ vector<int> Model::GetTrainingLabelVec() const{
 
 void Model::AddNumOfImagesInClass(){
   for(int x=0;x<=9;x++) {
+    //add instances of certain class in training labels to each index corresponding to class
     num_in_class_[x] = std::count(training_label_vec_.begin(), training_label_vec_.end(), x);
   }
 }
@@ -149,7 +150,7 @@ std::map<size_t, vector<vector<double>>> Model::GetFeatureProbMap() const {
   return feature_prob_map_;
 }
 
-size_t Model::ClassifyImage(Image &image) {
+size_t Model::ClassifyImage(const Image &image) {
   double likelihood_score;
   size_t best_class = 0;
   double max = -5000.0;
@@ -157,7 +158,7 @@ size_t Model::ClassifyImage(Image &image) {
     likelihood_score=log(prior_probabilities_.at(cl));
     for (size_t r = 0; r < image_dim_; r++) {
       for (size_t c = 0; c < image_dim_; c++) {
-        if(image.CheckSpace(r, c)) {
+        if(image.IsSpace(r, c)) { //if image at (r, c) is space
           likelihood_score +=
               log(1-feature_prob_map_[cl][r][c]);
         } else likelihood_score +=log(feature_prob_map_[cl][r][c]);
@@ -239,7 +240,7 @@ void Model::AddCurrentImageToList(const vector<char> &char_vec, naivebayes::Imag
     training_image_vec_.push_back(char_vec);
     current_image.SetImageVector(training_image_vec_);
     current_image.SetImageClass(image_class);
-    if(!prob_map_set_) {
+    if(!prob_map_set_) { //if probability map not set, then update
       UpdateFeatureProbMap(image_class);
     }
     size_t best_class = ClassifyImage(current_image);

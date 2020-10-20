@@ -26,7 +26,7 @@ map<size_t, vector<vector<double>>> ArgHandler::GetLoadedFeatureProbMap() {
   return loaded_feature_prob_map_;
 }
 
-void ArgHandler::WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Model &model, vector<double> prior_probabilities) {
+void ArgHandler::WriteProbabilitiesToFile(std::ofstream &ofstream, naivebayes::Model &model, const vector<double> &prior_probabilities) {
   for(size_t cl = 0; cl <= 9; cl++) { //class number
     for(size_t x=0;x<image_size_;x++) {
       for (size_t y = 0; y < image_size_; y++) {
@@ -45,37 +45,37 @@ void ArgHandler::RunCommandLineFunctions(const vector<string> &all_args, naiveba
   std::ifstream ifstream;
   std::ofstream ofstream;
 
-  //train TrainingLabelsName TrainingImagesName save FileToWriteTo
   if(all_args[0] == "train") {
+    //trains model
     model.ReadLabels(all_args[1]);
-
-    //read through training images
     std::ifstream ifstream_images;
-    ifstream_images.open(all_args[2]); // mnistdatatraining/trainingimages
+    ifstream_images.open(all_args[2]);
     while(ifstream_images.good()) {
       ifstream_images>> model;
     }
 
     vector<double> prior_probabilities = model.GetPriorProbabilities();
     if(all_args.size() == 5) {
-      if (all_args[3] == "save") {
+      if (all_args[3] == "save") { //train TrainingLabelsName TrainingImagesName save FileToWriteTo
         //saves model to file
-        ofstream.open(all_args[4]); // data/probabilities
-        WriteProbabilitiesToFile(ofstream,model, prior_probabilities);
+        SaveToFile(ofstream, all_args[4], model, prior_probabilities);
       }
-
     } else if(all_args.size()==6) {
       if(all_args[3] == "test") {
+        //train TrainingLabelsName TrainingImagesName test TestLabelsName TestImagesName
         loaded_feature_prob_map_ = model.GetFeatureProbMap();
         TestModel(all_args[4], all_args[5], loaded_feature_prob_map_);
       }
+
     } else throw std::invalid_argument("Invalid amount of command line args. Please try again.");
-  } else if(all_args[0] == "load") {  //load FileToLoadUp test TestLabelFile TestImageFile
+  } else if(all_args[0] == "load") {
+    //load FileToLoadUp test TestLabelFile TestImageFile
     if(all_args.size() == 5) {
       LoadFile(all_args[1]);
       if(all_args[2] == "test") {
         TestModel(all_args[3], all_args[4], loaded_feature_prob_map_);
       }
+
     } else throw std::invalid_argument("Invalid amount of command line args. Please try again.");
   } else {
     throw std::invalid_argument("Invalid command line arg. Please try again.");
@@ -92,7 +92,7 @@ void ArgHandler::ProcessCommandLineArgs(int argc, char *argv[], naivebayes::Mode
   RunCommandLineFunctions(all_args, model);
 }
 
-void ArgHandler::TestModel(const string& test_label_file, const string& test_image_file, std::map<size_t, vector<vector<double>>> &map) const{
+void ArgHandler::TestModel(const string& test_label_file, const string& test_image_file, const std::map<size_t, vector<vector<double>>> &map) const{
   naivebayes::Model m(map);
   m.ReadLabels(test_label_file);
   std::ifstream test;
@@ -127,6 +127,11 @@ void ArgHandler::LoadFile(const string &filename) {
     curr_class= cl;
     loaded_feature_prob_map_[cl][x][y] = feature_prob_at_point;
   }
+}
+
+void ArgHandler::SaveToFile(std::ofstream &ofstream, const string &filename, Model &model, const vector<double> &prior_probabilities) {
+  ofstream.open(filename); // data/probabilities
+  WriteProbabilitiesToFile(ofstream,model, prior_probabilities);
 }
 
 void ArgHandler::InitializeLoadedFeatureProbMap(size_t frequency_map_size) {

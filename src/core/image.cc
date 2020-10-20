@@ -20,7 +20,7 @@ void Image::SetImageClass(size_t image_class) {
   image_class_ = image_class;
 }
 
-bool Image::CheckSpace(size_t r, size_t c) const {
+bool Image::IsSpace(size_t r, size_t c) const {
   return (image_vector_[r][c] == ' ');
 }
 
