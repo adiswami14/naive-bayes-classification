@@ -9,7 +9,7 @@
 
 #include <core/model.h>
 
-namespace naivebayes { //TODO: Carefully look through cc file and javadoc
+namespace naivebayes {
 
 using std::vector;
 using std::string;

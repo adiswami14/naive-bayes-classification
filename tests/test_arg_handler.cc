@@ -73,7 +73,7 @@ TEST_CASE("Processing Command Line Arguments") {
     REQUIRE(map[0][0][0] == Approx(0.002079).epsilon(0.01));
     REQUIRE(map[7][27][14] == Approx(0.0452899).epsilon(0.01));
   }
-  SECTION("Loading model") {
+  SECTION("Loading and testing model") {
     //valid loading arguments
     naivebayes::ArgHandler argHandler1;
     naivebayes::Model model1;
