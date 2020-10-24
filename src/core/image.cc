@@ -1,26 +1,33 @@
-#include <core/image.h>
-#include <iostream>
+//
+// Created by Adithya Swaminathan on 10/11/20.
+//
+
+#include "core/image.h"
 
 namespace naivebayes {
 
-using std::count;
-
-std::string Image::GetBestClass() const {
-  return "CS 126";
+Image::Image(){
 }
 
-std::istream &operator >>(std::istream &istream, Image& image) {
-  int training_val;
-  istream >> training_val;
-  image.training_label_vec_.push_back(training_val);
-  return istream;
+void Image::SetImageVector(const vector<vector<char>> &image_vector) {
+  if(image_vector.empty()) {
+    throw std::invalid_argument("Image vector given as input is empty");
+  }
+  image_vector_ = image_vector;
 }
 
-vector<int> Image::GetTrainingLabelVec() const{
-  return training_label_vec_;
+void Image::SetImageClass(size_t image_class) {
+  if(image_class>9) {
+    throw std::invalid_argument("Image class input is not a single-digit number");
+  }
+  image_class_ = image_class;
 }
 
-size_t Image::GetNumOfImagesInClass(size_t class_num) const {
-  return count(training_label_vec_.begin(), training_label_vec_.end(), class_num);
+vector<vector<char>> Image::GetImageVector() const {
+  return image_vector_;
 }
-}// namespace naivebayes
+
+size_t Image::GetImageClass() const {
+  return image_class_;
+}
+}

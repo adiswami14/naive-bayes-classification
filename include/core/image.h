@@ -1,49 +1,60 @@
-#include <string>
+//
+// Created by Adithya Swaminathan on 10/11/20.
+//
+
+#ifndef NAIVE_BAYES_IMAGE_H
+#define NAIVE_BAYES_IMAGE_H
+
+#include <iostream>
 #include <vector>
+#include <map>
 
 namespace naivebayes {
 
 using std::vector;
+using std::map;
 
+/**
+ * Corresponds to a single image from the training data set, used to rasterize characters
+ */
 class Image {
  private:
-  vector<int> training_label_vec_;
+  //vector of a single image
+  vector<vector<char>> image_vector_;
+
+  //class of given image
+  size_t image_class_;
  public:
-  const size_t kLaplaceSmoothingFactor = 1;
-
-  std::string GetBestClass() const;
 
   /**
-   * Overloads the >> operator for a given image
-   * @param istream The input stream given
-   * @param image The instance of this Image class
-   * @return The input stream after operator overload
+   * Default Constructor of Image Class
    */
-  friend std::istream &operator >>(std::istream &istream, Image& image);
+  Image();
 
   /**
-   * Returns the training_label_vec variable
-   * @return Private variable training_label_vec
+   * Sets value of image_vector_ variable to variable passed in
+   * @param image_vector A 2d-vector of characters corresponding to a single image
    */
-  vector<int> GetTrainingLabelVec() const;
+  void SetImageVector(const vector<vector<char>> &image_vector);
 
   /**
-   * Identifies how many training images are in a given class
-   * @param class_num The number of the class
-   * @return The number of training images in a certain class
+   * Returns vector of all characters in image
+   * @return Value of the image_vector_ variable
    */
-  size_t GetNumOfImagesInClass(size_t class_num) const;
+  vector<vector<char>> GetImageVector() const;
+
+  /**
+   * Sets value of image_class_ variable to variable passed in
+   * @param image_class A number to assign a class variable to an image
+   */
+  void SetImageClass(size_t image_class);
+
+  /**
+   * Returns class value of the Image instance
+   * @return Value of the image_class_ variable
+   */
+  size_t GetImageClass() const;
 };
-}  // namespace naivebayes
+} //namespace naivebayes
 
-/*
-TODO: rename this file. You'll also need to modify CMakeLists.txt.
-
-You can (and should) create more classes and files in include/core (header
- files) and src/core (source files); this project is too big to only have a
- single class.
-
-Make sure to add any files that you create to CMakeLists.txt.
-
-TODO Delete this comment before submitting your code.
-*/
+#endif  // NAIVE_BAYES_IMAGE_H
