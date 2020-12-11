@@ -144,4 +144,7 @@ _deps
 ### Training Data Files ###
 mnistdatatraining/
 
+### Testing Data Files ###
+mnistdatavalidation/
+
 # End of https://www.gitignore.io/api/c++,cmake,clion

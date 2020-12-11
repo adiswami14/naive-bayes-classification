@@ -1,5 +1,7 @@
 #pragma once
 
+#include <core/image.h>
+
 #include "cinder/gl/gl.h"
 
 namespace naivebayes {
@@ -49,6 +51,15 @@ class Sketchpad {
    */
   void Clear();
 
+  /**
+   * @return Current image instance
+   */
+  Image GetImage();
+
+  /**
+   * Sets curr_image_vector_ to all spaces
+   */
+  void InitializeCurrImageVector();
  private:
   glm::vec2 top_left_corner_;
 
@@ -58,6 +69,10 @@ class Sketchpad {
   double pixel_side_length_;
 
   double brush_radius_;
+
+  naivebayes::Image image_; //the current image instance to be drawn
+
+  vector<vector<char>> curr_image_vector_; //vector of chars to set as image vector
 };
 
 }  // namespace visualizer

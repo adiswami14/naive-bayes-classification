@@ -54,22 +54,22 @@ list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES}
                             src/visualizer/naive_bayes_app.cc
                             src/visualizer/sketchpad.cc)
 
-list(APPEND TEST_FILES tests/test_model.cc tests/test_image.cc)
+list(APPEND TEST_FILES tests/test_model.cc tests/test_image.cc tests/test_arg_handler.cc)
 
-add_executable(train-model apps/train_model_main.cc ${CORE_SOURCE_FILES} src/core/image.cc include/core/image.h)
+add_executable(train-model apps/train_model_main.cc ${CORE_SOURCE_FILES} src/core/image.cc include/core/image.h src/core/arg_handler.cc include/core/arg_handler.h)
 target_include_directories(train-model PRIVATE include)
 
 ci_make_app(
         APP_NAME        sketchpad-classifier
         CINDER_PATH     ${CINDER_PATH}
-        SOURCES         apps/cinder_app_main.cc ${SOURCE_FILES}
+        SOURCES         apps/cinder_app_main.cc ${SOURCE_FILES} src/core/image.cc include/core/image.h src/core/arg_handler.cc include/core/arg_handler.h
         INCLUDES        include
 )
 
 ci_make_app(
         APP_NAME        naive-bayes-test
         CINDER_PATH     ${CINDER_PATH}
-        SOURCES         tests/test_main.cc ${CORE_SOURCE_FILES} src/core/image.cc include/core/image.h ${TEST_FILES}
+        SOURCES         tests/test_main.cc ${CORE_SOURCE_FILES} src/core/image.cc include/core/image.h src/core/arg_handler.cc include/core/arg_handler.h ${TEST_FILES}
         INCLUDES        include
         LIBRARIES       catch2
 )

@@ -7,10 +7,8 @@ using std::map;
 using std::vector;
 
 void ReadTestFiles(std::ifstream &ifstream, naivebayes::Model &model) {
-  ifstream.open("data/testinglabel.txt");
-  while(ifstream.good()) {
-    ifstream >> model;
-  }
+  model.ReadLabels("data/testinglabel");
+
   std::ifstream ifstream_images;
   ifstream_images.open("data/testingimages");
   while (ifstream_images.good()) {
@@ -19,10 +17,7 @@ void ReadTestFiles(std::ifstream &ifstream, naivebayes::Model &model) {
 }
 
 void ReadTrainingFiles(std::ifstream &ifstream, naivebayes::Model &model) {
-  ifstream.open("mnistdatatraining/traininglabels");
-  while(ifstream.good()) {
-    ifstream >> model;
-  }
+  model.ReadLabels("mnistdatatraining/traininglabels");
 
   std::ifstream ifstream_images;
   ifstream_images.open("mnistdatatraining/trainingimages");
@@ -37,7 +32,7 @@ TEST_CASE("Reading through datasets") {
     naivebayes::Model model;
     ReadTrainingFiles(ifstream, model);
     REQUIRE(model.GetTrainingLabelVec().size() == 5000);
-    REQUIRE(model.GetNumOfImagesInClass(0) == 479);
+    REQUIRE(model.GetNumOfImagesInClass()[0] == 479);
     REQUIRE(model.GetImageList().size() == 5000);
 
     //make sure initialization of maps makes all value 0
@@ -65,9 +60,9 @@ TEST_CASE("Reading through datasets") {
     ReadTestFiles(ifstream, model);
     REQUIRE(model.GetTrainingLabelVec().size()==3);
     REQUIRE(model.GetImageList().size()==3);
-    REQUIRE(model.GetNumOfImagesInClass(0) ==1);
-    REQUIRE(model.GetNumOfImagesInClass(7) ==1);
-    REQUIRE(model.GetNumOfImagesInClass(4) ==1);
+    REQUIRE(model.GetNumOfImagesInClass()[0] == 1);
+    REQUIRE(model.GetNumOfImagesInClass()[4] == 1);
+    REQUIRE(model.GetNumOfImagesInClass()[7] == 1);
 
     SECTION("Check Training Label Vector") {
       vector<int> training_vec;
@@ -126,6 +121,113 @@ TEST_CASE("Accessing Model Member variables") {
             model.GetImageList().at(0).GetImageVector());
     REQUIRE(v.at(0).GetImageClass() ==
             model.GetImageList().at(0).GetImageClass());
+  }
+}
+
+TEST_CASE("Processing Prior Probabilities") {
+  std::ifstream ifstream;
+  naivebayes::Model model(4);
+  model.ReadLabels("data/testinglabel");
+  std::ifstream istream("data/testingimages");
+  while(istream.good()) {
+    istream >> model;
+  }
+  vector<double> vector = model.GetPriorProbabilities();
+
+  SECTION("Testing values in testing labels") {
+    REQUIRE(vector.at(0) == Approx(0.154).epsilon(0.01));
+    REQUIRE(vector.at(7) == Approx(0.154).epsilon(0.01));
+    REQUIRE(vector.at(4) == Approx(0.154).epsilon(0.01));
+  }
+
+  SECTION("Testing values not in testing labels") {
+    REQUIRE(vector.at(1) == Approx(0.077).epsilon(0.01));
+    REQUIRE(vector.at(3) == Approx(0.077).epsilon(0.01));
+    REQUIRE(vector.at(8) == Approx(0.077).epsilon(0.01));
+  }
+}
+
+TEST_CASE("Processing Pixel Probabilities") {
+  std::ifstream ifstream;
+  naivebayes::Model model(4);
+  model.ReadLabels("data/testinglabel");
+  std::ifstream ifstream_images;
+  ifstream_images.open("data/testingimages");
+  while (ifstream_images.good()) {
+    ifstream_images >> model;
+  }
+  SECTION("Testing values in testing labels") {
+    SECTION("Shaded Pixels") {
+      REQUIRE(model.FindProbabilityOfShadingAtPoint(0, std::make_pair(0, 0)) ==
+              Approx(0.666667).epsilon(0.01));
+      REQUIRE(model.FindProbabilityOfShadingAtPoint(4, std::make_pair(1, 2)) ==
+              Approx(0.666667).epsilon(0.01));
+      REQUIRE(model.FindProbabilityOfShadingAtPoint(7, std::make_pair(0, 0)) ==
+              Approx(0.666667).epsilon(0.01));
+    }
+
+    SECTION("Unshaded Pixels") {
+      REQUIRE(model.FindProbabilityOfShadingAtPoint(7, std::make_pair(3, 2)) ==
+              Approx(0.333333).epsilon(0.01));
+      REQUIRE(model.FindProbabilityOfShadingAtPoint(4, std::make_pair(0, 1)) ==
+              Approx(0.333333).epsilon(0.01));
+      REQUIRE(model.FindProbabilityOfShadingAtPoint(0, std::make_pair(1, 1)) ==
+              Approx(0.333333).epsilon(0.01));
+    }
+  }
+
+  SECTION("Testing values not in testing labels") {
+    REQUIRE(model.FindProbabilityOfShadingAtPoint(3, std::make_pair(0,0)) == Approx(0.5).epsilon(0.01));
+    REQUIRE(model.FindProbabilityOfShadingAtPoint(9, std::make_pair(3,2)) == Approx(0.5).epsilon(0.01));
+  }
+}
+
+TEST_CASE("Classifying Images from Small Dataset") {
+  naivebayes::Model model(4);
+  model.ReadLabels("data/testinglabel");
+  std::ifstream ifstream_images;
+  ifstream_images.open("data/testingimages");
+  while (ifstream_images.good()) {
+    ifstream_images >> model;
+  }
+  SECTION("Classifying images") {
+    naivebayes::Model model1(4, model.GetFeatureProbMap());
+    model1.ReadLabels("data/dataset_labels");
+    std::ifstream ifstream;
+    ifstream.open("data/dataset_images");
+    while (ifstream.good()) {
+      ifstream >> model1;
+    }
+    vector<size_t> best_class_list = model1.GetBestClassList();
+    REQUIRE(best_class_list[0] == model1.GetTrainingLabelVec()[0]);
+    REQUIRE(best_class_list[1] == model1.GetTrainingLabelVec()[1]);
+    REQUIRE(best_class_list[2] == model1.GetTrainingLabelVec()[2]);
+  }
+}
+
+TEST_CASE("Classifying Image Sanity Check") {
+  naivebayes::Model model;
+  model.ReadLabels("mnistdatatraining/traininglabels");
+  std::ifstream ifstream_images;
+  ifstream_images.open("mnistdatatraining/trainingimages");
+  while (ifstream_images.good()) {
+    ifstream_images >> model;
+  }
+  SECTION("Get Overall Accuracy of Tests") {
+    naivebayes::Model model1(model.GetFeatureProbMap());
+    model1.ReadLabels("mnistdatavalidation/testlabels");
+    std::ifstream ifstream;
+    ifstream.open("mnistdatavalidation/testimages");
+    while (ifstream.good()) {
+      ifstream >> model1;
+    }
+    size_t matches = 0;
+    vector<size_t> v = model1.GetBestClassList();
+    for(int x=0;x<1000;x++) {
+      if(v.at(x) == model1.GetTrainingLabelVec().at(x))
+        matches++;
+    }
+    REQUIRE(matches>=770);
   }
 }
 

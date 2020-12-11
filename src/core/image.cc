@@ -10,9 +10,6 @@ Image::Image(){
 }
 
 void Image::SetImageVector(const vector<vector<char>> &image_vector) {
-  if(image_vector.empty()) {
-    throw std::invalid_argument("Image vector given as input is empty");
-  }
   image_vector_ = image_vector;
 }
 
@@ -21,6 +18,10 @@ void Image::SetImageClass(size_t image_class) {
     throw std::invalid_argument("Image class input is not a single-digit number");
   }
   image_class_ = image_class;
+}
+
+bool Image::IsSpace(size_t r, size_t c) const {
+  return (image_vector_[r][c] == ' ');
 }
 
 vector<vector<char>> Image::GetImageVector() const {
